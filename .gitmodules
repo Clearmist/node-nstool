@@ -1,0 +1,15 @@
+[submodule "src/deps/libmbedtls"]
+	path = src/deps/libmbedtls
+	url = https://github.com/jakcron/libmbedtls.git
+[submodule "src/deps/libfmt"]
+	path = src/deps/libfmt
+	url = https://github.com/jakcron/libfmt.git
+[submodule "src/deps/libtoolchain"]
+	path = src/deps/libtoolchain
+	url = https://github.com/jakcron/libtoolchain.git
+[submodule "src/deps/liblz4"]
+	path = src/deps/liblz4
+	url = https://github.com/jakcron/liblz4.git
+[submodule "src/deps/libpietendo"]
+	path = src/deps/libpietendo
+	url = https://github.com/jakcron/libpietendo.git

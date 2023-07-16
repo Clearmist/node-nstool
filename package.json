@@ -1,0 +1,29 @@
+{
+  "name": "node-nstool",
+  "version": "0.1.0",
+  "description": "Node native module to access nstool.",
+  "keywords": ["nstool", "switch", "nintendo", "nca", "xci"],
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp rebuild -j max",
+    "clean": "node-gyp clean"
+  },
+  "homepage": "https://github.com/Clearmist/node-nstool#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Clearmist/node-nstool.git"
+  },
+  "author": {
+    "name": "Matthew Sanders",
+    "url": "https://github.com/Clearmist"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "node-addon-api": "^7.0.0",
+    "node-gyp-build": "^4.6.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^9.4.0"
+  },
+  "gypfile": true
+}
