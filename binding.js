@@ -1,5 +1,4 @@
 const fs = require('fs');
-const napi = require('node-addon-api');
 
 const arg = process.argv.slice(2);
 
@@ -8,10 +7,6 @@ let list = [];
 
 switch (arg[0]) {
   case 'sources':
-    list = [
-      'src/node-nstool.cpp',
-    ];
-
     [
       './src/nstool',
       './src/deps/libfmt/src',
@@ -22,6 +17,12 @@ switch (arg[0]) {
       './src/deps/libpietendo/src/hac',
       './src/deps/libpietendo/src/hac/es',
       './src/deps/libtoolchain/src',
+      './src/deps/libtoolchain/src/cli',
+      './src/deps/libtoolchain/src/crypto',
+      './src/deps/libtoolchain/src/crypto/detail',
+      './src/deps/libtoolchain/src/io',
+      './src/deps/libtoolchain/src/os',
+      './src/deps/libtoolchain/src/string',
     ].forEach((directory) => {
       fs.readdirSync(directory).filter((file) => file.endsWith('.c') || file.endsWith('.cpp')).forEach((file) => {
         list.push(`${directory}/${file}`);
@@ -36,6 +37,7 @@ switch (arg[0]) {
       './src/deps/libmbedtls/include',
       './src/deps/libpietendo/include',
       './src/deps/libtoolchain/include',
+      './src/deps/nlohmann',
     ];
     break;
   case 'dependencies':

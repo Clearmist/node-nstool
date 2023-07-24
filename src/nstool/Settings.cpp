@@ -55,7 +55,7 @@ private:
 class DeprecatedOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	DeprecatedOptionHandler(const std::string& warn_message, const std::vector<std::string>& opts) : 
+	DeprecatedOptionHandler(const std::string& warn_message, const std::vector<std::string>& opts) :
 		mWarnMessage(warn_message),
 		mOptStrings(opts),
 		mOptRegex()
@@ -84,7 +84,7 @@ private:
 class FlagOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	FlagOptionHandler(bool& flag, const std::vector<std::string>& opts) : 
+	FlagOptionHandler(bool& flag, const std::vector<std::string>& opts) :
 		mFlag(flag),
 		mOptStrings(opts),
 		mOptRegex()
@@ -118,7 +118,7 @@ private:
 class SingleParamStringOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	SingleParamStringOptionHandler(tc::Optional<std::string>& param, const std::vector<std::string>& opts) : 
+	SingleParamStringOptionHandler(tc::Optional<std::string>& param, const std::vector<std::string>& opts) :
 		mParam(param),
 		mOptStrings(opts),
 		mOptRegex()
@@ -152,7 +152,7 @@ private:
 class SingleParamPathOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	SingleParamPathOptionHandler(tc::Optional<tc::io::Path>& param, const std::vector<std::string>& opts) : 
+	SingleParamPathOptionHandler(tc::Optional<tc::io::Path>& param, const std::vector<std::string>& opts) :
 		mParam(param),
 		mOptStrings(opts),
 		mOptRegex()
@@ -186,7 +186,7 @@ private:
 class SingleParamSizetOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	SingleParamSizetOptionHandler(size_t& param, const std::vector<std::string>& opts) : 
+	SingleParamSizetOptionHandler(size_t& param, const std::vector<std::string>& opts) :
 		mParam(param),
 		mOptStrings(opts),
 		mOptRegex()
@@ -263,7 +263,7 @@ private:
 class FileTypeOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	FileTypeOptionHandler(nstool::Settings::FileType& param, const std::vector<std::string>& opts) : 
+	FileTypeOptionHandler(nstool::Settings::FileType& param, const std::vector<std::string>& opts) :
 		mParam(param),
 		mOptStrings(opts),
 		mOptRegex()
@@ -411,7 +411,7 @@ private:
 class ExtractDataPathOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	ExtractDataPathOptionHandler(std::vector<nstool::ExtractJob>& jobs, const std::vector<std::string>& opts) : 
+	ExtractDataPathOptionHandler(std::vector<nstool::ExtractJob>& jobs, const std::vector<std::string>& opts) :
 		mJobs(jobs),
 		mOptStrings(opts),
 		mOptRegex()
@@ -436,7 +436,7 @@ public:
 		else if (params.size() == 2)
 		{
 			mJobs.push_back({tc::io::Path(params[0]), tc::io::Path(params[1])});
-		} 
+		}
 		else
 		{
 			throw tc::ArgumentOutOfRangeException(fmt::format("Option \"{:s}\" requires parameters in the format \"[<internal path>] <extract path>\".", option));
@@ -451,7 +451,7 @@ private:
 class CustomExtractDataPathOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
-	CustomExtractDataPathOptionHandler(std::vector<nstool::ExtractJob>& jobs, const std::vector<std::string>& opts, const tc::io::Path& custom_path) : 
+	CustomExtractDataPathOptionHandler(std::vector<nstool::ExtractJob>& jobs, const std::vector<std::string>& opts, const tc::io::Path& custom_path) :
 		mJobs(jobs),
 		mOptStrings(opts),
 		mOptRegex(),
@@ -485,7 +485,7 @@ public:
 		{
 			fmt::print("Consider using \"-x {:s} {:s}\" instead.\n", mCustomPath.to_string(), params[0]);
 		}
-			
+
 
 		mJobs.push_back({mCustomPath, tc::io::Path(params[0])});
 	}
@@ -541,7 +541,7 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 
 			try {
 				tc::io::FileStream test = tc::io::FileStream(keyfile_path, tc::io::FileMode::Open, tc::io::FileAccess::Read);
-				
+
 				mKeysetPath = keyfile_path;
 			}
 			catch (tc::io::FileNotFoundException&) {
@@ -583,7 +583,7 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 		usage_text();
 		throw tc::ArgumentException(mModuleLabel, "Not enough arguments.");
 	}
-	
+
 	// detect request for help
 	for (auto itr = ++(args.begin()); itr != args.end(); itr++)
 	{
@@ -649,12 +649,12 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 
 	// kip options
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(kip.extract_path, { "--kipdir" })));
-	
+
 	// aset options
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(aset.icon_extract_path, { "--icon" })));
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(aset.nacp_extract_path, { "--nacp" })));
 
-	
+
 	// process option
 	opts.processOptions(args, 1, args.size() - 2);
 }
@@ -662,7 +662,7 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 void nstool::SettingsInitializer::determine_filetype()
 {
 	//fmt::print("infile path = \"{}\"\n", infile.path.get().to_string());
-	
+
 	auto file = tc::io::StreamSource(std::make_shared<tc::io::FileStream>(tc::io::FileStream(infile.path.get(), tc::io::FileMode::Open, tc::io::FileAccess::Read)));
 
 	auto raw_data = file.pullData(0, 0x5000);
@@ -974,7 +974,7 @@ bool nstool::SettingsInitializer::determineValidNcaFromSample(const tc::ByteData
 	{
 		return false;
 	}
-	
+
 	if (opt.keybag.nca_header_key.isNull())
 	{
 		fmt::print("[WARNING] Failed to load NCA Header Key.\n");

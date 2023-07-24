@@ -4,6 +4,7 @@
 #include "RomfsProcess.h"
 
 #include <pietendo/hac/AssetHeader.h>
+#include "tc.h"
 
 namespace nstool {
 
@@ -20,7 +21,7 @@ public:
 
 	void setIconExtractPath(const tc::io::Path& path);
 	void setNacpExtractPath(const tc::io::Path& path);
-	
+
 	void setRomfsShowFsTree(bool show_fs_tree);
 	void setRomfsExtractJobs(const std::vector<nstool::ExtractJob>& extract_jobs);
 private:

@@ -1,6 +1,9 @@
 #include <napi.h>
 #include <tc.h>
 #include <tc/os/UnicodeMain.h>
+#define FMT_HEADER_ONLY
+#include <fmt/core.h>
+#include "json.hpp"
 #include "Settings.h"
 #include "GameCardProcess.h"
 #include "PfsProcess.h"
@@ -17,7 +20,16 @@
 #include "EsTikProcess.h"
 #include "AssetProcess.h"
 
-int umain(const std::vector<std::string>& args, Napi::Env Env)
+nlohmann::json output = {
+    {"error", false},
+    {"errorMessage", ""},
+};
+
+std::string start(const std::vector<std::string>& args, Napi::Env Env) {
+    return output.dump();
+}
+
+int umain(const std::vector<std::string>& args, const std::vector<std::string>& env)
 {
 	try
 	{
@@ -25,8 +37,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 
 		std::shared_ptr<tc::io::IStream> infile_stream = std::make_shared<tc::io::FileStream>(tc::io::FileStream(set.infile.path.get(), tc::io::FileMode::Open, tc::io::FileAccess::Read));
 
-		if (set.infile.filetype == nstool::Settings::FILE_TYPE_GAMECARD)
-		{
+		if (set.infile.filetype == nstool::Settings::FILE_TYPE_GAMECARD) {
 			nstool::GameCardProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -39,9 +50,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setExtractJobs(set.fs.extract_jobs);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_PARTITIONFS || set.infile.filetype == nstool::Settings::FILE_TYPE_NSP)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_PARTITIONFS || set.infile.filetype == nstool::Settings::FILE_TYPE_NSP) {
 			nstool::PfsProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -53,10 +62,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setExtractJobs(set.fs.extract_jobs);
 
 			obj.process();
-		}
-
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ROMFS)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ROMFS) {
 			nstool::RomfsProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -67,9 +73,8 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setExtractJobs(set.fs.extract_jobs);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NCA)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NCA) {
+
 			nstool::NcaProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -82,9 +87,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setExtractJobs(set.fs.extract_jobs);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_META)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_META) {
 			nstool::MetaProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -93,9 +96,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_CNMT)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_CNMT) {
 			nstool::CnmtProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -103,9 +104,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NSO)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NSO) {
 			nstool::NsoProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -117,9 +116,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setListSymbols(set.code.list_symbols);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NRO)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NRO) {
 			nstool::NroProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -139,9 +136,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setAssetRomfsExtractJobs(set.fs.extract_jobs);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NACP)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NACP) {
 			nstool::NacpProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -149,9 +144,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_INI)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_INI) {
 			nstool::IniProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -162,9 +155,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 				obj.setKipExtractPath(set.kip.extract_path.get());
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_KIP)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_KIP) {
 			nstool::KipProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -172,9 +163,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ES_CERT)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ES_CERT) {
 			nstool::EsCertProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -183,9 +172,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ES_TIK)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_ES_TIK) {
 			nstool::EsTikProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -195,9 +182,7 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 			obj.setVerifyMode(set.opt.verify);
 
 			obj.process();
-		}
-		else if (set.infile.filetype == nstool::Settings::FILE_TYPE_HB_ASSET)
-		{
+		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_HB_ASSET) {
 			nstool::AssetProcess obj;
 
 			obj.setInputFile(infile_stream);
@@ -214,11 +199,10 @@ int umain(const std::vector<std::string>& args, Napi::Env Env)
 
 			obj.process();
 		}
-	}
-	catch (tc::Exception& e)
-	{
+	} catch (tc::Exception& e) {
 		fmt::print("[{0}{1}ERROR] {2}\n", e.module(), (strlen(e.module()) != 0 ? " ": ""), e.error());
 		return 1;
 	}
+
 	return 0;
 }
