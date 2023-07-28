@@ -11,7 +11,9 @@
                 "<!(node -p \"require('node-addon-api').include_dir\")",
                 "<!@(node binding.js include_dirs)"
             ],
-            'libraries': [],
+            'libraries': [
+                '<!@(node binding.js libraries)'
+            ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")",
             ],

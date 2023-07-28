@@ -26,6 +26,10 @@ nlohmann::json output = {
 };
 
 std::string start(const std::vector<std::string>& args, Napi::Env Env) {
+    const std::vector<std::string> env = {"prod"};
+
+    umain(args, env);
+
     return output.dump();
 }
 

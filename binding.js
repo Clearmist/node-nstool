@@ -2,32 +2,14 @@ const fs = require('fs');
 
 const arg = process.argv.slice(2);
 
-// Individual files to include.
+// A list of files or directories to return.
 let list = [];
 
 switch (arg[0]) {
   case 'sources':
-    [
-      './src/nstool',
-      './src/deps/libfmt/src',
-      './src/deps/liblz4/src',
-      './src/deps/libmbedtls/src',
-      './src/deps/libpietendo/src/ctr',
-      './src/deps/libpietendo/src/ctr/es',
-      './src/deps/libpietendo/src/hac',
-      './src/deps/libpietendo/src/hac/es',
-      './src/deps/libtoolchain/src',
-      './src/deps/libtoolchain/src/cli',
-      './src/deps/libtoolchain/src/crypto',
-      './src/deps/libtoolchain/src/crypto/detail',
-      './src/deps/libtoolchain/src/io',
-      './src/deps/libtoolchain/src/os',
-      './src/deps/libtoolchain/src/string',
-    ].forEach((directory) => {
-      fs.readdirSync(directory).filter((file) => file.endsWith('.c') || file.endsWith('.cpp')).forEach((file) => {
-        list.push(`${directory}/${file}`);
-      });
-    });
+    const directory = './src/nstool';
+
+    fs.readdirSync(directory).filter((file) => file.endsWith('.c') || file.endsWith('.cpp')).forEach((file) => list.push(`${directory}/${file}`));
     break;
   case 'include_dirs':
     list = [
@@ -40,8 +22,14 @@ switch (arg[0]) {
       './src/deps/nlohmann',
     ];
     break;
-  case 'dependencies':
-    list = [];
+  case 'libraries':
+    list = [
+      '<(module_root_dir)/library/libfmt/build/Release/fmt.lib',
+      '<(module_root_dir)/library/liblz4/build/Release/liblz4.lib',
+      '<(module_root_dir)/library/libmbedtls/build/Release/libmbedtls.lib',
+      '<(module_root_dir)/library/libtoolchain/build/Release/tc.lib',
+      '<(module_root_dir)/library/libpietendo/build/Release/pietendo.lib',
+    ];
     break;
   default:
     console.log('[Error] Invalid binding key.');

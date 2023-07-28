@@ -2,10 +2,23 @@
   "name": "node-nstool",
   "version": "0.1.0",
   "description": "Node native module to access nstool.",
-  "keywords": ["nstool", "switch", "nintendo", "nca", "xci"],
+  "keywords": [
+    "nstool",
+    "switch",
+    "nintendo",
+    "nca",
+    "xci"
+  ],
   "main": "index.js",
   "scripts": {
-    "build": "node-gyp rebuild -j max",
+    "build": "node-gyp build -j max -m",
+    "rebuild": "node-gyp rebuild -j max -m",
+    "build-libraries": "npm-run-all --parallel libfmt liblz4 libmbedtls --serial libtoolchain libpietendo",
+    "libfmt": "cd src/deps/libfmt && cmake-js rebuild -d ../../../library/libfmt -o ../../../library",
+    "liblz4": "cd src/deps/liblz4 && cmake-js rebuild -d ../../../library/liblz4 -o ../../../library",
+    "libmbedtls": "cd src/deps/libmbedtls && cmake-js rebuild -d ../../../library/libmbedtls -o ../../../library",
+    "libtoolchain": "cd src/deps/libtoolchain && cmake-js rebuild -d ../../../library/libtoolchain -o ../../../library",
+    "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild -d ../../../library/libpietendo -o ../../../library",
     "clean": "node-gyp clean"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",
@@ -19,11 +32,13 @@
   },
   "license": "ISC",
   "dependencies": {
+    "cmake-js": "^7.2.1",
     "node-addon-api": "^7.0.0",
     "node-gyp-build": "^4.6.0"
   },
   "devDependencies": {
-    "node-gyp": "^9.4.0"
+    "node-gyp": "^9.4.0",
+    "npm-run-all": "^4.1.5"
   },
   "gypfile": true
 }
