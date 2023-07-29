@@ -3,7 +3,6 @@
 #include <tc/os/UnicodeMain.h>
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
-#include "json.hpp"
 #include "Settings.h"
 #include "GameCardProcess.h"
 #include "PfsProcess.h"
@@ -19,8 +18,7 @@
 #include "EsCertProcess.h"
 #include "EsTikProcess.h"
 #include "AssetProcess.h"
-
-using json = nlohmann::json;
+#include "Output.hpp"
 
 std::string FileTypes[16] = {
     "ERROR",
@@ -39,13 +37,6 @@ std::string FileTypes[16] = {
     "ES_CERT",
     "ES_TIK",
     "HB_ASSET"
-};
-
-json output = {
-    {"error", false},
-    {"errorMessage", ""},
-    {"warnings", json::array()},
-    {"log", json::array()},
 };
 
 // Napi::Env does not have a default constructor so initialize it with a null pointer.
