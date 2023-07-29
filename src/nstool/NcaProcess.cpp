@@ -1,6 +1,7 @@
 #include "NcaProcess.h"
 #include "MetaProcess.h"
 #include "util.h"
+#include "main.h"
 
 #include <pietendo/hac/ContentArchiveUtil.h>
 #include <pietendo/hac/AesKeygen.h>
@@ -23,6 +24,8 @@ nstool::NcaProcess::NcaProcess() :
 
 void nstool::NcaProcess::process()
 {
+    output["log"].push_back("Processing NCA file.");
+
 	// import header
 	importHeader();
 
@@ -127,7 +130,7 @@ void nstool::NcaProcess::generateNcaBodyEncryptionKeys()
 	// create zeros key
 	KeyBag::aes128_key_t zero_aesctr_key;
 	memset(zero_aesctr_key.data(), 0, zero_aesctr_key.size());
-	
+
 	// get key data from header
 	byte_t masterkey_rev = pie::hac::AesKeygen::getMasterKeyRevisionFromKeyGeneration(mHdr.getKeyGeneration());
 	byte_t keak_index = mHdr.getKeyAreaEncryptionKeyIndex();
@@ -206,7 +209,7 @@ void nstool::NcaProcess::generateNcaBodyEncryptionKeys()
 			mContentKey.aes_ctr = mKeyCfg.fallback_content_key.get();
 		}
 	}
-	
+
 	if (mCliOutputMode.show_keydata)
 	{
 		if (mContentKey.aes_ctr.isSet())
@@ -267,7 +270,7 @@ void nstool::NcaProcess::generatePartitionConfiguration()
 			throw tc::Exception(mModuleName, fmt::format("NCA FS Header [{:d}] Version({:d}): UNSUPPORTED", partition.header_index, fs_header.version.unwrap()));
 		}
 
-		// setup AES-CTR 
+		// setup AES-CTR
 		pie::hac::ContentArchiveUtil::getNcaPartitionAesCtr(&fs_header, info.aes_ctr.data());
 
 		// save partition configinfo
@@ -281,14 +284,14 @@ void nstool::NcaProcess::generatePartitionConfiguration()
 		if (info.hash_type == pie::hac::nca::HashType_HierarchicalSha256)
 		{
 			info.hierarchicalsha256_hdr.fromBytes(fs_header.hash_info.data(), fs_header.hash_info.size());
-		}	
+		}
 		else if (info.hash_type == pie::hac::nca::HashType_HierarchicalIntegrity)
 		{
 			info.hierarchicalintegrity_hdr.fromBytes(fs_header.hash_info.data(), fs_header.hash_info.size());
 		}
 
 		// create reader
-		try 
+		try
 		{
 			// handle partition encryption and partition compaction (sparse layer)
 			if (fs_header.sparse_info.generation.unwrap() != 0)
@@ -421,7 +424,7 @@ void nstool::NcaProcess::validateNcaSignatures()
 	{
 		fmt::print("[WARNING] NCA Header Main Signature: FAIL (could not load header key)\n");
 	}
-	
+
 
 	// validate signature[1]
 	if (mHdr.getContentType() == pie::hac::nca::ContentType_Program)
@@ -469,6 +472,24 @@ void nstool::NcaProcess::validateNcaSignatures()
 
 void nstool::NcaProcess::displayHeader()
 {
+    output["archive"]["header"]["formatType"]["string"] = pie::hac::ContentArchiveUtil::getFormatHeaderVersionAsString((pie::hac::nca::HeaderFormatVersion)mHdr.getFormatVersion());
+	output["archive"]["header"]["formatType"]["int"] = mHdr.getFormatVersion();
+    output["archive"]["header"]["distributionType"]["string"] = pie::hac::ContentArchiveUtil::getDistributionTypeAsString(mHdr.getDistributionType());
+    output["archive"]["header"]["distributionType"]["int"] = mHdr.getDistributionType();
+    output["archive"]["header"]["contentType"]["string"] = pie::hac::ContentArchiveUtil::getContentTypeAsString(mHdr.getContentType());
+    output["archive"]["header"]["contentType"]["int"] = mHdr.getContentType();
+    output["archive"]["header"]["keyGeneration"] = mHdr.getKeyGeneration();
+    output["archive"]["header"]["signatureGeneration"] = mHdr.getSignatureKeyGeneration();
+    output["archive"]["header"]["kaekIndex"] = fmt::format("{:s} ({:d})", pie::hac::ContentArchiveUtil::getKeyAreaEncryptionKeyIndexAsString((pie::hac::nca::KeyAreaEncryptionKeyIndex)mHdr.getKeyAreaEncryptionKeyIndex()), mHdr.getKeyAreaEncryptionKeyIndex());
+    output["archive"]["header"]["size"]["hex"] = fmt::format("0x{:x}", mHdr.getContentSize());
+    output["archive"]["header"]["size"]["decimal"] = mHdr.getContentSize();
+    output["archive"]["header"]["programId"]["string"] = fmt::format("{:016x}", mHdr.getProgramId());
+    output["archive"]["header"]["programId"]["hex"] = fmt::format("0x{:016x}", mHdr.getProgramId());
+    output["archive"]["header"]["programId"]["decimal"] = mHdr.getProgramId();
+    output["archive"]["header"]["contentIndex"] = mHdr.getContentIndex();
+    output["archive"]["header"]["sdkVersion"]["string"] = pie::hac::ContentArchiveUtil::getSdkAddonVersionAsString(mHdr.getSdkAddonVersion());
+    output["archive"]["header"]["sdkVersion"]["int"] = mHdr.getSdkAddonVersion();
+
 	fmt::print("[NCA Header]\n");
 	fmt::print("  Format Type:     {:s}\n", pie::hac::ContentArchiveUtil::getFormatHeaderVersionAsString((pie::hac::nca::HeaderFormatVersion)mHdr.getFormatVersion()));
 	fmt::print("  Dist. Type:      {:s}\n", pie::hac::ContentArchiveUtil::getDistributionTypeAsString(mHdr.getDistributionType()));
@@ -480,11 +501,14 @@ void nstool::NcaProcess::displayHeader()
 	fmt::print("  ProgID:          0x{:016x}\n", mHdr.getProgramId());
 	fmt::print("  Content Index:   {:d}\n", mHdr.getContentIndex());
 	fmt::print("  SdkAddon Ver.:   {:s} (v{:d})\n", pie::hac::ContentArchiveUtil::getSdkAddonVersionAsString(mHdr.getSdkAddonVersion()), mHdr.getSdkAddonVersion());
-	if (mHdr.hasRightsId())
+
+    if (mHdr.hasRightsId())
 	{
+        output["archive"]["header"]["rightsId"] = tc::cli::FormatUtil::formatBytesAsString(mHdr.getRightsId().data(), mHdr.getRightsId().size(), true, "");
+
 		fmt::print("  RightsId:        {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mHdr.getRightsId().data(), mHdr.getRightsId().size(), true, ""));
 	}
-	
+
 	if (mContentKey.kak_list.size() > 0 && mCliOutputMode.show_keydata)
 	{
 		fmt::print("  Key Area:\n");
@@ -495,9 +519,9 @@ void nstool::NcaProcess::displayHeader()
 		{
 			std::string enc_key = tc::cli::FormatUtil::formatBytesAsString(mContentKey.kak_list[i].enc.data(), mContentKey.kak_list[i].enc.size(), true, "");
 			std::string dec_key = mContentKey.kak_list[i].decrypted ? tc::cli::FormatUtil::formatBytesAsString(mContentKey.kak_list[i].dec.data(), mContentKey.kak_list[i].dec.size(), true, "") : "<unable to decrypt>";
-			
+
 			fmt::print("    | {:3d} | {:32s} | {:32s} |\n", mContentKey.kak_list[i].index, enc_key, dec_key);
-		
+
 		}
 		fmt::print("    <--------------------------------------------------------------------------->\n");
 	}
@@ -505,6 +529,7 @@ void nstool::NcaProcess::displayHeader()
 	if (mCliOutputMode.show_layout)
 	{
 		fmt::print("  Partitions:\n");
+
 		for (size_t i = 0; i < mHdr.getPartitionEntryList().size(); i++)
 		{
 			uint32_t index = mHdr.getPartitionEntryList()[i].header_index;
@@ -575,7 +600,6 @@ void nstool::NcaProcess::displayHeader()
 		}
 	}
 }
-
 
 void nstool::NcaProcess::processPartitions()
 {

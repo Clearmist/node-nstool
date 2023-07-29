@@ -26,6 +26,8 @@ const nodeNSTool = {
     try {
       const results = JSON.parse(nstool.run(...passing));
 
+      results.parameters = passing;
+
       return results;
     } catch (error) {
       // Convert Napi::Error exceptions.

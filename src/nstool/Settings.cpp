@@ -967,7 +967,6 @@ void nstool::SettingsInitializer::dump_rsa_key(const KeyBag::rsa_key_t& key, con
 	}
 }
 
-
 bool nstool::SettingsInitializer::determineValidNcaFromSample(const tc::ByteData& sample) const
 {
 	if (sample.size() < pie::hac::nca::kHeaderSize)

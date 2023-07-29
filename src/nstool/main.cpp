@@ -20,12 +20,40 @@
 #include "EsTikProcess.h"
 #include "AssetProcess.h"
 
-nlohmann::json output = {
-    {"error", false},
-    {"errorMessage", ""},
+using json = nlohmann::json;
+
+std::string FileTypes[16] = {
+    "ERROR",
+    "GAMECAARD",
+    "NSP",
+    "PARTITIONFS",
+    "ROMFS",
+    "NCA",
+    "META",
+    "CNMT",
+    "NSO",
+    "NRO",
+    "NACP",
+    "INI",
+    "KIP",
+    "ES_CERT",
+    "ES_TIK",
+    "HB_ASSET"
 };
 
+json output = {
+    {"error", false},
+    {"errorMessage", ""},
+    {"warnings", json::array()},
+    {"log", json::array()},
+};
+
+// Napi::Env does not have a default constructor so initialize it with a null pointer.
+Napi::Env Environment = nullptr;
+
 std::string start(const std::vector<std::string>& args, Napi::Env Env) {
+    Environment = Env;
+
     const std::vector<std::string> env = {"prod"};
 
     umain(args, env);
@@ -35,11 +63,16 @@ std::string start(const std::vector<std::string>& args, Napi::Env Env) {
 
 int umain(const std::vector<std::string>& args, const std::vector<std::string>& env)
 {
+    output["log"].push_back("Starting the program.");
+
 	try
 	{
 		nstool::Settings set = nstool::SettingsInitializer(args);
 
 		std::shared_ptr<tc::io::IStream> infile_stream = std::make_shared<tc::io::FileStream>(tc::io::FileStream(set.infile.path.get(), tc::io::FileMode::Open, tc::io::FileAccess::Read));
+
+        output["archive"]["type"]["int"] = set.infile.filetype;
+        output["archive"]["type"]["string"] = FileTypes[set.infile.filetype];
 
 		if (set.infile.filetype == nstool::Settings::FILE_TYPE_GAMECARD) {
 			nstool::GameCardProcess obj;
@@ -78,7 +111,6 @@ int umain(const std::vector<std::string>& args, const std::vector<std::string>& 
 
 			obj.process();
 		} else if (set.infile.filetype == nstool::Settings::FILE_TYPE_NCA) {
-
 			nstool::NcaProcess obj;
 
 			obj.setInputFile(infile_stream);

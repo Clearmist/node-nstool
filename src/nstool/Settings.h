@@ -54,7 +54,7 @@ struct Settings
 	} code;
 
 	// Generic FS options
-	struct FsOptions 
+	struct FsOptions
 	{
 		bool show_fs_tree;
 		std::vector<ExtractJob> extract_jobs;
