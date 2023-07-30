@@ -5,7 +5,7 @@
 nstool::NsoProcess::NsoProcess() :
 	mModuleName("nstool::NsoProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false),
 	mIs64BitInstruction(true),
 	mListApi(false),
@@ -237,7 +237,7 @@ void nstool::NsoProcess::displayNsoHeader()
 		fmt::print("      MemoryOffset:   0x{:x}\n", mHdr.getRoDynSymInfo().offset);
 		fmt::print("      MemorySize:     0x{:x}\n", mHdr.getRoDynSymInfo().size);
 	}
-	
+
 	fmt::print("    .data:\n");
 	fmt::print("      MemoryOffset:   0x{:x}\n", mHdr.getDataSegmentInfo().memory_layout.offset);
 	fmt::print("      MemorySize:     0x{:x}\n", mHdr.getDataSegmentInfo().memory_layout.size);

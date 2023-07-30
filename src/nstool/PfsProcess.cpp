@@ -11,7 +11,7 @@
 nstool::PfsProcess::PfsProcess() :
 	mModuleName("nstool::PfsProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false),
 	mPfs(),
 	mFileSystem(),
@@ -67,10 +67,10 @@ void nstool::PfsProcess::process()
 
 	// set properties for FsProcess
 	mFsProcess.setFsProperties({
-		fmt::format("Type:        {:s}", pie::hac::PartitionFsUtil::getFsTypeAsString(mPfs.getFsType())), 
+		fmt::format("Type:        {:s}", pie::hac::PartitionFsUtil::getFsTypeAsString(mPfs.getFsType())),
 		fmt::format("FileNum:     {:d}", mPfs.getFileList().size())
 	});
-	
+
 	mFsProcess.process();
 }
 

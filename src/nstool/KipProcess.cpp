@@ -7,7 +7,7 @@
 nstool::KipProcess::KipProcess() :
 	mModuleName("nstool::KipProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -223,7 +223,7 @@ void nstool::KipProcess::displayKernelCap(const pie::hac::KernelCapabilityContro
 		fmt::print("  MemoryMaps:\n");
 		for (size_t i = 0; i < maps.size(); i++)
 		{
-			fmt::print("    {:s}\n", formatMappingAsString(maps[i]));	
+			fmt::print("    {:s}\n", formatMappingAsString(maps[i]));
 		}
 		//fmt::print("  IoMaps:\n");
 		for (size_t i = 0; i < ioMaps.size(); i++)

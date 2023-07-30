@@ -8,7 +8,7 @@
 nstool::RomfsProcess::RomfsProcess() :
 	mModuleName("nstool::RomfsProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false),
 	mDirNum(0),
 	mFileNum(0),
@@ -113,7 +113,7 @@ void nstool::RomfsProcess::process()
 
 	// set properties for FsProcess
 	mFsProcess.setFsProperties({
-		fmt::format("DirNum:      {:d}", mDirNum), 
+		fmt::format("DirNum:      {:d}", mDirNum),
 		fmt::format("FileNum:     {:d}", mFileNum)
 	});
 

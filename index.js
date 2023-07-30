@@ -38,6 +38,7 @@ const nodeNSTool = {
     const parameters = [
       'nstool',
       '--info',
+      '--json',
     ];
 
     return this.run(options, parameters);
@@ -61,6 +62,7 @@ const nodeNSTool = {
 
     const parameters = [
       'nstool',
+      '--json',
       '--type',
       'nca',
       '--extract',

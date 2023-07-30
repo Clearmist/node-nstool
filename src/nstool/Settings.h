@@ -134,6 +134,7 @@ private:
 	bool mShowLayout;
 	bool mShowKeydata;
 	bool mVerbose;
+    bool mJSON;
 
 	tc::Optional<tc::io::Path> mKeysetPath;
 	tc::Optional<KeyBag::aes128_key_t> mNcaEncryptedContentKey;

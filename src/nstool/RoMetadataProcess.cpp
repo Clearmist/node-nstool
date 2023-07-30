@@ -6,7 +6,7 @@
 
 nstool::RoMetadataProcess::RoMetadataProcess() :
 	mModuleName("nstool::RoMetadataProcess"),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mIs64BitInstruction(true),
 	mListApi(false),
 	mListSymbols(false),
@@ -26,7 +26,7 @@ nstool::RoMetadataProcess::RoMetadataProcess() :
 void nstool::RoMetadataProcess::process()
 {
 	importApiList();
-	
+
 	if (mCliOutputMode.show_basic_info)
 		displayRoMetaData();
 }
@@ -150,7 +150,7 @@ void nstool::RoMetadataProcess::importApiList()
 void nstool::RoMetadataProcess::displayRoMetaData()
 {
 	size_t api_num = mSdkVerApiList.size() + mPublicApiList.size() + mDebugApiList.size() + mPrivateApiList.size();
-	
+
 	if (api_num > 0 && (mListApi || mCliOutputMode.show_extended_info))
 	{
 		fmt::print("[SDK API List]\n");

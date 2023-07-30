@@ -1,4 +1,6 @@
+#if defined(NODE_ADDON_API)
 #include <napi.h>
+#endif
 #include <tc.h>
 #include <tc/os/UnicodeMain.h>
 #define FMT_HEADER_ONLY
@@ -39,9 +41,7 @@ std::string FileTypes[16] = {
     "HB_ASSET"
 };
 
-// Napi::Env does not have a default constructor so initialize it with a null pointer.
-Napi::Env Environment = nullptr;
-
+#if defined(NODE_ADDON_API)
 std::string start(const std::vector<std::string>& args, Napi::Env Env) {
     Environment = Env;
 
@@ -51,14 +51,17 @@ std::string start(const std::vector<std::string>& args, Napi::Env Env) {
 
     return output.dump();
 }
+#endif
 
 int umain(const std::vector<std::string>& args, const std::vector<std::string>& env)
 {
-    output["log"].push_back("Starting the program.");
+    handleLog("Starting the program.");
 
 	try
 	{
 		nstool::Settings set = nstool::SettingsInitializer(args);
+
+        outputJSON = set.opt.cli_output_mode.show_json;
 
 		std::shared_ptr<tc::io::IStream> infile_stream = std::make_shared<tc::io::FileStream>(tc::io::FileStream(set.infile.path.get(), tc::io::FileMode::Open, tc::io::FileAccess::Read));
 
@@ -227,9 +230,14 @@ int umain(const std::vector<std::string>& args, const std::vector<std::string>& 
 			obj.process();
 		}
 	} catch (tc::Exception& e) {
-		fmt::print("[{0}{1}ERROR] {2}\n", e.module(), (strlen(e.module()) != 0 ? " ": ""), e.error());
+        handleError(fmt::format("[{0}{1}ERROR] {2}\n", e.module(), (strlen(e.module()) != 0 ? " ": ""), e.error()));
 		return 1;
 	}
+
+    // This is not a Node addon module so print the output to the command line.
+    if (!nodeAddon && outputJSON) {
+        fmt::print("{}", output.dump(4));
+    }
 
 	return 0;
 }

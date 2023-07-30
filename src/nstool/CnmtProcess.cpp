@@ -5,7 +5,7 @@
 nstool::CnmtProcess::CnmtProcess() :
 	mModuleName("nstool::CnmtProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }

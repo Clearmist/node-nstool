@@ -20,6 +20,7 @@ switch (arg[0]) {
       './src/deps/libpietendo/include',
       './src/deps/libtoolchain/include',
       './src/deps/nlohmann',
+      './src/deps/date'
     ];
     break;
   case 'libraries':

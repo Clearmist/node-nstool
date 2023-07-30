@@ -5,10 +5,10 @@
 nstool::AssetProcess::AssetProcess() :
 	mModuleName("nstool::AssetProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
-}    
+}
 
 void nstool::AssetProcess::process()
 {
@@ -16,7 +16,7 @@ void nstool::AssetProcess::process()
 	if (mCliOutputMode.show_basic_info)
 		displayHeader();
 	processSections();
-}     
+}
 
 void nstool::AssetProcess::setInputFile(const std::shared_ptr<tc::io::IStream>& file)
 {
@@ -82,7 +82,7 @@ void nstool::AssetProcess::processSections()
 
 	if (mHdr.getIconInfo().size > 0 && mIconExtractPath.isSet())
 	{
-		if ((mHdr.getIconInfo().size + mHdr.getIconInfo().offset) > file_size) 
+		if ((mHdr.getIconInfo().size + mHdr.getIconInfo().offset) > file_size)
 			throw tc::Exception(mModuleName, "ASET geometry for icon beyond file size");
 
 		fmt::print("Saving {:s}...", mIconExtractPath.get().to_string());
@@ -91,7 +91,7 @@ void nstool::AssetProcess::processSections()
 
 	if (mHdr.getNacpInfo().size > 0)
 	{
-		if ((mHdr.getNacpInfo().size + mHdr.getNacpInfo().offset) > file_size) 
+		if ((mHdr.getNacpInfo().size + mHdr.getNacpInfo().offset) > file_size)
 			throw tc::Exception(mModuleName, "ASET geometry for nacp beyond file size");
 
 		if (mNacpExtractPath.isSet())
@@ -99,7 +99,7 @@ void nstool::AssetProcess::processSections()
 			fmt::print("Saving {:s}...", mNacpExtractPath.get().to_string());
 			writeSubStreamToFile(mFile, mHdr.getNacpInfo().offset, mHdr.getNacpInfo().size, mNacpExtractPath.get());
 		}
-		
+
 		mNacp.setInputFile(std::make_shared<tc::io::SubStream>(mFile, mHdr.getNacpInfo().offset, mHdr.getNacpInfo().size));
 		mNacp.setCliOutputMode(mCliOutputMode);
 		mNacp.setVerifyMode(mVerify);
@@ -109,7 +109,7 @@ void nstool::AssetProcess::processSections()
 
 	if (mHdr.getRomfsInfo().size > 0)
 	{
-		if ((mHdr.getRomfsInfo().size + mHdr.getRomfsInfo().offset) > file_size) 
+		if ((mHdr.getRomfsInfo().size + mHdr.getRomfsInfo().offset) > file_size)
 			throw tc::Exception(mModuleName, "ASET geometry for romfs beyond file size");
 
 		mRomfs.setInputFile(std::make_shared<tc::io::SubStream>(mFile, mHdr.getRomfsInfo().offset, mHdr.getRomfsInfo().size));
@@ -134,6 +134,6 @@ void nstool::AssetProcess::displayHeader()
 		fmt::print("  RomFs:\n");
 		fmt::print("    Offset:       0x{:x}\n", mHdr.getRomfsInfo().offset);
 		fmt::print("    Size:         0x{:x}\n", mHdr.getRomfsInfo().size);
-	}	
+	}
 }
-		
+

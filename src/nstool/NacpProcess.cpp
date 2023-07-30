@@ -5,7 +5,7 @@
 nstool::NacpProcess::NacpProcess() :
 	mModuleName("nstool::NacpProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -67,7 +67,7 @@ void nstool::NacpProcess::importNacp()
 void nstool::NacpProcess::displayNacp()
 {
 	fmt::print("[ApplicationControlProperty]\n");
-	
+
 	// Title
 	if (mNacp.getTitle().size() > 0)
 	{
@@ -93,7 +93,7 @@ void nstool::NacpProcess::displayNacp()
 	{
 		fmt::print("  ISBN:                                   (NotSet)\n");
 	}
-	
+
 	// StartupUserAccount
 	if (mNacp.getStartupUserAccount() != pie::hac::nacp::StartupUserAccount_None || mCliOutputMode.show_extended_info)
 	{
@@ -188,7 +188,7 @@ void nstool::NacpProcess::displayNacp()
 	if (mNacp.getRatingAge().size() > 0)
 	{
 		fmt::print("  RatingAge:\n");
-		
+
 		for (auto itr = mNacp.getRatingAge().begin(); itr != mNacp.getRatingAge().end(); itr++)
 		{
 			fmt::print("    {:s}:\n", pie::hac::ApplicationControlPropertyUtil::getOrganisationAsString(itr->organisation));
@@ -486,7 +486,7 @@ void nstool::NacpProcess::displayNacp()
 	{
 		fmt::print("  NeighborDetectionClientConfiguration:   None\n");
 	}
-	
+
 	// JitConfiguration
 	if (mNacp.getJitConfiguration().is_enabled || mCliOutputMode.show_extended_info)
 	{
@@ -494,7 +494,7 @@ void nstool::NacpProcess::displayNacp()
 		fmt::print("    IsEnabled:  {}\n", mNacp.getJitConfiguration().is_enabled);
 		fmt::print("    MemorySize: 0x{:016x}\n", mNacp.getJitConfiguration().memory_size);
 	}
-	
+
 	// PlayReportPermission
 	if (mNacp.getPlayReportPermission() != pie::hac::nacp::PlayReportPermission_None || mCliOutputMode.show_extended_info)
 	{

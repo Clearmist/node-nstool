@@ -6,7 +6,7 @@
 nstool::IniProcess::IniProcess() :
 	mModuleName("nstool::IniProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false),
 	mKipExtractPath()
 {
@@ -87,7 +87,7 @@ void nstool::IniProcess::importKipList()
 	{
 		mFile->seek(kip_pos, tc::io::SeekOrigin::Begin);
 		mFile->read((byte_t*)&hdr_raw, sizeof(hdr_raw));
-		hdr.fromBytes((byte_t*)&hdr_raw, sizeof(hdr_raw));		
+		hdr.fromBytes((byte_t*)&hdr_raw, sizeof(hdr_raw));
 		kip_size = getKipSizeFromHeader(hdr);
 		mKipList.push_back({hdr, std::make_shared<tc::io::SubStream>(tc::io::SubStream(mFile, kip_pos, kip_size))});
 		kip_pos += kip_size;
@@ -123,7 +123,7 @@ void nstool::IniProcess::extractKipList()
 	// make extract dir
 	tc::io::LocalFileSystem local_fs;
 	local_fs.createDirectory(mKipExtractPath.get());
-	
+
 	// out path for extracted KIP
 	tc::io::Path out_path;
 
@@ -141,7 +141,7 @@ void nstool::IniProcess::extractKipList()
 }
 
 int64_t nstool::IniProcess::getKipSizeFromHeader(const pie::hac::KernelInitialProcessHeader& hdr) const
-{	
+{
 	// the order of elements in a KIP are sequential, there are no file offsets
 	return int64_t(sizeof(pie::hac::sKipHeader)) + int64_t(hdr.getTextSegmentInfo().file_layout.size + hdr.getRoSegmentInfo().file_layout.size + hdr.getDataSegmentInfo().file_layout.size);
 }

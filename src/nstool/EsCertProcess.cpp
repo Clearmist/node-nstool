@@ -7,7 +7,7 @@
 nstool::EsCertProcess::EsCertProcess() :
 	mModuleName("nstool::EsCertProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -77,7 +77,7 @@ void nstool::EsCertProcess::importCerts()
 void nstool::EsCertProcess::validateCerts()
 {
 	PkiValidator pki;
-	
+
 	try
 	{
 		pki.setKeyCfg(mKeyCfg);
@@ -114,7 +114,7 @@ void nstool::EsCertProcess::displayCert(const pie::hac::es::SignedData<pie::hac:
 		fmt::print(" ({:d})", (uint32_t)cert.getBody().getPublicKeyType());
 	fmt::print("\n");
 	fmt::print("  CertID:        0x{:x}\n", cert.getBody().getCertId());
-	
+
 	if (cert.getBody().getPublicKeyType() == pie::hac::es::cert::RSA4096)
 	{
 		fmt::print("  PublicKey:\n");

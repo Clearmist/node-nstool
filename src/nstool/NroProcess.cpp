@@ -3,7 +3,7 @@
 nstool::NroProcess::NroProcess() :
 	mModuleName("nstool::NroProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -167,7 +167,7 @@ void nstool::NroProcess::displayHeader()
 		fmt::print("    .dynsym:\n");
 		fmt::print("      Offset:     0x{:x}\n", mHdr.getRoDynSymInfo().memory_offset);
 		fmt::print("      Size:       0x{:x}\n", mHdr.getRoDynSymInfo().size);
-	}                                                                
+	}
 	fmt::print("    .data:\n");
 	fmt::print("      Offset:     0x{:x}\n", mHdr.getDataInfo().memory_offset);
 	fmt::print("      Size:       0x{:x}\n", mHdr.getDataInfo().size);

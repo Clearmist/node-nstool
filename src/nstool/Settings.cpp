@@ -502,6 +502,7 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 	mShowLayout(false),
 	mShowKeydata(false),
 	mVerbose(false),
+    mJSON(false),
 	mNcaEncryptedContentKey(),
 	mNcaContentKey(),
 	mTikPath(),
@@ -514,20 +515,27 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 
 	// determine CLI output mode
 	opt.cli_output_mode.show_basic_info = true;
-	if (mVerbose)
+
+    if (mVerbose)
 	{
 		opt.cli_output_mode.show_extended_info = true;
 		opt.cli_output_mode.show_layout = true;
 		opt.cli_output_mode.show_keydata = true;
 	}
-	if (mShowKeydata)
+
+    if (mShowKeydata)
 	{
 		opt.cli_output_mode.show_keydata = true;
 	}
-	if (mShowLayout)
+
+    if (mShowLayout)
 	{
 		opt.cli_output_mode.show_layout = true;
 	}
+
+    if (mJSON) {
+        opt.cli_output_mode.show_json = true;
+    }
 
 	// locate key file, if not specfied
 	if (mKeysetPath.isNull())
@@ -610,6 +618,7 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 	opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(mShowLayout, {"--showlayout"})));
 	opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(mShowKeydata, { "--showkeys" })));
 	opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(mVerbose, {"-v", "--verbose"})));
+    opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(mJSON, {"--json"})));
 	opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(opt.verify, {"-y", "--verify"})));
 	opts.registerOptionHandler(std::shared_ptr<FlagOptionHandler>(new FlagOptionHandler(opt.is_dev, {"-d", "--dev"})));
 

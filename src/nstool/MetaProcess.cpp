@@ -8,7 +8,7 @@
 nstool::MetaProcess::MetaProcess() :
 	mModuleName("nstool::MetaProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -109,7 +109,7 @@ void nstool::MetaProcess::validateAcidSignature(const pie::hac::AccessControlInf
 	catch (tc::Exception& e) {
 		fmt::print("[WARNING] ACID Signature: FAIL ({:s})\n", e.error());
 	}
-	
+
 }
 
 void nstool::MetaProcess::validateAciFromAcid(const pie::hac::AccessControlInfo& aci, const pie::hac::AccessControlInfoDesc& acid)
@@ -290,7 +290,7 @@ void nstool::MetaProcess::validateAciFromAcid(const pie::hac::AccessControlInfo&
 		if (misc_flags.test(i) && desc_misc_flags.test(i) == false)
 		{
 			fmt::print("[WARNING] ACI/KC MiscFlag: FAIL ({:s} not permitted)\n", pie::hac::KernelCapabilityUtil::getMiscFlagsBitAsString(pie::hac::kc::MiscFlagsBit(i)));
-		}		
+		}
 	}
 }
 
@@ -353,13 +353,13 @@ void nstool::MetaProcess::displayFac(const pie::hac::FileSystemAccessControl& fa
 			{
 				fs_access_str_list.push_back(flag_string);
 			}
-			
+
 		}
 
 		fmt::print("  FsAccess:\n");
 		fmt::print("{:s}", tc::cli::FormatUtil::formatListWithLineLimit(fs_access_str_list, 60, 4));
 	}
-	
+
 	if (fac.getContentOwnerIdList().size())
 	{
 		fmt::print("  Content Owner IDs:\n");
@@ -425,7 +425,7 @@ void nstool::MetaProcess::displayKernelCap(const pie::hac::KernelCapabilityContr
 		fmt::print("  MemoryMaps:\n");
 		for (size_t i = 0; i < maps.size(); i++)
 		{
-			fmt::print("    {:s}\n", formatMappingAsString(maps[i]));	
+			fmt::print("    {:s}\n", formatMappingAsString(maps[i]));
 		}
 		//fmt::print("  IoMaps:\n");
 		for (size_t i = 0; i < ioMaps.size(); i++)

@@ -6,7 +6,7 @@
 nstool::EsTikProcess::EsTikProcess() :
 	mModuleName("nstool::EsTikProcess"),
 	mFile(),
-	mCliOutputMode(true, false, false, false),
+	mCliOutputMode(true, false, false, false, false),
 	mVerify(false)
 {
 }
@@ -90,7 +90,7 @@ void nstool::EsTikProcess::verifyTicket()
 		break;
 	}
 
-	try 
+	try
 	{
 		pki_validator.setKeyCfg(mKeyCfg);
 		pki_validator.addCertificates(mCerts);
@@ -104,7 +104,7 @@ void nstool::EsTikProcess::verifyTicket()
 
 void nstool::EsTikProcess::displayTicket()
 {
-	const pie::hac::es::TicketBody_V2& body = mTik.getBody();	
+	const pie::hac::es::TicketBody_V2& body = mTik.getBody();
 
 	fmt::print("[ES Ticket]\n");
 	fmt::print("  SignType:         {:s}", getSignTypeStr(mTik.getSignature().getSignType()));
@@ -131,7 +131,7 @@ void nstool::EsTikProcess::displayTicket()
 		fmt::print("    Data:           <cannot display>\n");
 	}
 	fmt::print("  Version:          {:s} (v{:d})\n", getTitleVersionStr(body.getTicketVersion()), body.getTicketVersion());
-	fmt::print("  License Type:     {:s}\n", getLicenseTypeStr(body.getLicenseType())); 
+	fmt::print("  License Type:     {:s}\n", getLicenseTypeStr(body.getLicenseType()));
 	if (body.getPropertyFlags().size() > 0 || mCliOutputMode.show_extended_info)
 	{
 		pie::hac::es::sTicketBody_v2* raw_body = (pie::hac::es::sTicketBody_v2*)body.getBytes().data();
@@ -146,13 +146,13 @@ void nstool::EsTikProcess::displayTicket()
 		fmt::print("  Reserved Region:\n");
 		fmt::print("    {:s}\n", tc::cli::FormatUtil::formatBytesAsString(body.getReservedRegion(), 8, true, ""));
 	}
-	
+
 	if (body.getTicketId() != 0 || mCliOutputMode.show_extended_info)
 		fmt::print("  TicketId:         0x{:016x}\n", body.getTicketId());
-	
+
 	if (body.getDeviceId() != 0 || mCliOutputMode.show_extended_info)
 		fmt::print("  DeviceId:         0x{:016x}\n", body.getDeviceId());
-	
+
 	fmt::print("  RightsId:         \n");
 	fmt::print("    {:s}\n", tc::cli::FormatUtil::formatBytesAsString(body.getRightsId(), 16, true, ""));
 

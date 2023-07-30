@@ -17,6 +17,9 @@
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")",
             ],
+            'defines': [
+                'NODE_ADDON_API',
+            ],
             'conditions': [
                 [
                     "OS=='win'",
