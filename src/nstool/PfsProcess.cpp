@@ -79,6 +79,11 @@ void nstool::PfsProcess::setInputFile(const std::shared_ptr<tc::io::IStream>& fi
 	mFile = file;
 }
 
+void nstool::PfsProcess::setOutputFile(const std::string& file)
+{
+	mOutputFile = file;
+}
+
 void nstool::PfsProcess::setCliOutputMode(CliOutputMode type)
 {
 	mCliOutputMode = type;
@@ -103,6 +108,7 @@ void nstool::PfsProcess::setFsRootLabel(const std::string& root_label)
 void nstool::PfsProcess::setExtractJobs(const std::vector<nstool::ExtractJob>& extract_jobs)
 {
 	mFsProcess.setExtractJobs(extract_jobs);
+    mFsProcess.setExtractFile(mOutputFile);
 }
 
 const pie::hac::PartitionFsHeader& nstool::PfsProcess::getPfsHeader() const
@@ -118,10 +124,12 @@ const std::shared_ptr<tc::io::IFileSystem>& nstool::PfsProcess::getFileSystem() 
 size_t nstool::PfsProcess::determineHeaderSize(const pie::hac::sPfsHeader* hdr)
 {
 	size_t fileEntrySize = 0;
-	if (hdr->st_magic.unwrap() == pie::hac::pfs::kPfsStructMagic)
-		fileEntrySize = sizeof(pie::hac::sPfsFile);
-	else
-		fileEntrySize = sizeof(pie::hac::sHashedPfsFile);
+
+    if (hdr->st_magic.unwrap() == pie::hac::pfs::kPfsStructMagic) {
+        fileEntrySize = sizeof(pie::hac::sPfsFile);
+    } else {
+        fileEntrySize = sizeof(pie::hac::sHashedPfsFile);
+    }
 
 	return sizeof(pie::hac::sPfsHeader) + hdr->file_num.unwrap() * fileEntrySize + hdr->name_table_size.unwrap();
 }
