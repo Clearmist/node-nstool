@@ -72,7 +72,7 @@ int umain(const std::vector<std::string>& args, const std::vector<std::string>& 
 			nstool::GameCardProcess obj;
 
 			obj.setInputFile(infile_stream);
-            // obj.setOutputFile(set.outfile.filename);
+            obj.setOutputFile(set.outfile.filename);
 			obj.setKeyCfg(set.opt.keybag);
 			obj.setCliOutputMode(set.opt.cli_output_mode);
 			obj.setVerifyMode(set.opt.verify);
