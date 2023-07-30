@@ -95,7 +95,7 @@ int umain(const std::vector<std::string>& args, const std::vector<std::string>& 
 			nstool::RomfsProcess obj;
 
 			obj.setInputFile(infile_stream);
-            // obj.setOutputFile(set.outfile.filename);
+            obj.setOutputFile(set.outfile.filename);
 			obj.setCliOutputMode(set.opt.cli_output_mode);
 			obj.setVerifyMode(set.opt.verify);
 			obj.setShowFsTree(set.fs.show_fs_tree);
