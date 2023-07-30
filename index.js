@@ -37,8 +37,8 @@ const nodeNSTool = {
   information: function(options) {
     const parameters = [
       'nstool',
-      '--info',
       '--json',
+      '--fstree',
     ];
 
     return this.run(options, parameters);

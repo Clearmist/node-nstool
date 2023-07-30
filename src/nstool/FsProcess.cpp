@@ -195,20 +195,24 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 	tc::io::sDirectoryListing info;
 	mInputFs->getDirectoryListing(v_path, info);
 
-	if (print_fs) {
-		for (size_t i = 0; i < v_path.size(); i++) {
-            fmt::print(" ");
-        }
+    const std::string directory = v_path.back();
 
-		fmt::print("{:s}/\n", ((v_path.size() == 1) ? (mFsRootLabel.isSet() ? (mFsRootLabel.get() + ":")  : "Root:") : v_path.back()));
+	if (print_fs) {
+        if (!outputJSON) {
+            for (size_t i = 0; i < v_path.size(); i++) {
+                fmt::print(" ");
+            }
+
+            fmt::print("{:s}/\n", ((v_path.size() == 1) ? (mFsRootLabel.isSet() ? (mFsRootLabel.get() + ":")  : "Root:") : directory));
+        }
 	}
 
 	if (extract_fs) {
-		// create local dir
+		// create local directory
 		local_fs.createDirectory(l_path);
 	}
 
-	// iterate thru child files
+	// iterate through child files
 	size_t cache_read_len;
 	tc::io::Path out_path;
 	std::shared_ptr<tc::io::IStream> in_stream;
@@ -216,11 +220,27 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 
 	for (auto itr = info.file_list.begin(); itr != info.file_list.end(); itr++) {
 		if (print_fs) {
-			for (size_t i = 0; i < v_path.size(); i++) {
-                fmt::print(" ");
-            }
+            if (outputJSON) {
+                const std::string rootLabbel = mFsRootLabel.isSet() ? mFsRootLabel.get() : "Root";
+                const std::string fullPath = directory == ""
+                    ? fmt::format("{:s}:/{:s}", rootLabbel, *itr)
+                    : fmt::format("{:s}:/{:s}/{:s}", rootLabbel, directory, *itr);
 
-			fmt::print(" {:s}\n", *itr);
+                nlohmann::json entry = {
+                    {"rootLabel", rootLabbel},
+                    {"directory", directory},
+                    {"file", *itr},
+                    {"fullPath", fullPath}
+                };
+
+                output["archive"]["files"].push_back(entry);
+            } else {
+                for (size_t i = 0; i < v_path.size(); i++) {
+                    fmt::print(" ");
+                }
+
+                fmt::print(" {:s}\n", *itr);
+            }
 		}
 
 		if (extract_fs) {
@@ -250,7 +270,7 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 		}
 	}
 
-	// iterate thru child dirs
+	// iterate through child directories
 	for (auto itr = info.dir_list.begin(); itr != info.dir_list.end(); itr++) {
 		visitDir(v_path + *itr, l_path + *itr, extract_fs, print_fs);
 	}

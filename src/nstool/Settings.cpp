@@ -794,6 +794,7 @@ void nstool::SettingsInitializer::usage_text() const
 	fmt::print("      --showkeys      Show keys generated.\n");
 	fmt::print("      --showlayout    Show layout metadata.\n");
 	fmt::print("      -v, --verbose   Verbose output.\n");
+    fmt::print("      --json          Format the output to JSON.\n");
 	fmt::print("\n  PFS0/HFS0 (PartitionFs), RomFs, NSP (Nintendo Submission Package)\n");
 	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] <file>\n", BIN_NAME);
 	fmt::print("      --fstree        Print filesystem tree.\n");
