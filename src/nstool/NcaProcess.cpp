@@ -37,12 +37,14 @@ void nstool::NcaProcess::process()
 	generatePartitionConfiguration();
 
 	// validate signatures
-	if (mVerify)
-		validateNcaSignatures();
+	if (mVerify) {
+        validateNcaSignatures();
+    }
 
 	// display header
-	if (mCliOutputMode.show_basic_info)
-		displayHeader();
+	if (mCliOutputMode.show_basic_info) {
+        displayHeader();
+    }
 
 	// process partition
 	processPartitions();
@@ -51,6 +53,11 @@ void nstool::NcaProcess::process()
 void nstool::NcaProcess::setInputFile(const std::shared_ptr<tc::io::IStream>& file)
 {
 	mFile = file;
+}
+
+void nstool::NcaProcess::setOutputFile(const std::string& file)
+{
+	mOutputFile = file;
 }
 
 void nstool::NcaProcess::setBaseNcaPath(const tc::Optional<tc::io::Path>& nca_path)
@@ -86,6 +93,7 @@ void nstool::NcaProcess::setFsRootLabel(const std::string& root_label)
 void nstool::NcaProcess::setExtractJobs(const std::vector<nstool::ExtractJob>& extract_jobs)
 {
 	mFsProcess.setExtractJobs(extract_jobs);
+    mFsProcess.setExtractFile(mOutputFile);
 }
 
 const std::shared_ptr<tc::io::IFileSystem>& nstool::NcaProcess::getFileSystem() const

@@ -13,6 +13,7 @@ nstool::FsProcess::FsProcess() :
 	mShowFsInfo(false),
 	mProperties(),
 	mShowFsTree(false),
+    mOutputFile(),
 	mFsRootLabel(),
 	mExtractJobs(),
 	mDataCache(0x10000)
@@ -82,6 +83,11 @@ void nstool::FsProcess::setExtractJobs(const std::vector<nstool::ExtractJob>& ex
 	mExtractJobs = extract_jobs;
 }
 
+void nstool::FsProcess::setExtractFile(std::string outputFile)
+{
+	mOutputFile = outputFile;
+}
+
 void nstool::FsProcess::printFs()
 {
 	handleLog(fmt::format("[{:s}/Tree]\n", (mFsFormatName.isSet() ? mFsFormatName.get() : "FileSystem")));
@@ -99,7 +105,7 @@ void nstool::FsProcess::extractFs()
 		{
 			visitDir(tc::io::Path("/"), itr->extract_path, true, false);
 
-			handleLog(fmt::format("Root directory virtual path: \"{:s}\"\n", itr->virtual_path.to_string()), "warn");
+			handleLog(fmt::format("Root directory virtual path: \"{:s}\"\n", itr->virtual_path.to_string()));
 
 			// root directory extract successful, continue to next job
 			continue;
@@ -125,7 +131,7 @@ void nstool::FsProcess::extractFs()
 
 				tc::io::Path file_extract_path = itr->extract_path + itr->virtual_path.back();
 
-				handleLog(fmt::format("Saving {:s}\n", file_extract_path.to_string()));
+				handleLog(fmt::format("Extracting file to {:s}\n", file_extract_path.to_string()));
 
 				writeStreamToFile(file_stream, itr->extract_path + itr->virtual_path.back(), mDataCache);
 
@@ -219,18 +225,18 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 	std::shared_ptr<tc::io::IStream> out_stream;
 
 	for (auto itr = info.file_list.begin(); itr != info.file_list.end(); itr++) {
+        // build out path
+        out_path = l_path + *itr;
+
 		if (print_fs) {
             if (outputJSON) {
                 const std::string rootLabbel = mFsRootLabel.isSet() ? mFsRootLabel.get() : "Root";
-                const std::string fullPath = directory == ""
-                    ? fmt::format("{:s}:/{:s}", rootLabbel, *itr)
-                    : fmt::format("{:s}:/{:s}/{:s}", rootLabbel, directory, *itr);
 
                 nlohmann::json entry = {
                     {"rootLabel", rootLabbel},
                     {"directory", directory},
                     {"file", *itr},
-                    {"fullPath", fullPath}
+                    {"fullPath", fmt::format("{:s}:{:s}", rootLabbel, out_path.to_string())}
                 };
 
                 output["archive"]["files"].push_back(entry);
@@ -243,10 +249,9 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
             }
 		}
 
-		if (extract_fs) {
-			// build out path
-			out_path = l_path + *itr;
+        fmt::print("Current file {}. Looking for {}", *itr, mOutputFile);
 
+		if (extract_fs && (mOutputFile == "" || (mOutputFile == *itr))) {
 			handleLog(fmt::format("Saving {:s}\n", out_path.to_string()));
 
 			// begin export
@@ -260,7 +265,7 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 				cache_read_len = in_stream->read(mDataCache.data(), mDataCache.size());
 
                 if (cache_read_len == 0) {
-					throw tc::io::IOException(mModuleLabel, fmt::format("Failed to read from {:s}file.", (mFsFormatName.isSet() ? (mFsFormatName.get() + " ") : "")));
+					throw tc::io::IOException(mModuleLabel, fmt::format("Failed to read from {:s} file.", (mFsFormatName.isSet() ? (mFsFormatName.get() + " ") : "")));
 				}
 
 				out_stream->write(mDataCache.data(), cache_read_len);
@@ -272,6 +277,9 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
 
 	// iterate through child directories
 	for (auto itr = info.dir_list.begin(); itr != info.dir_list.end(); itr++) {
-		visitDir(v_path + *itr, l_path + *itr, extract_fs, print_fs);
+        // When traversing each directory append the directory to the local path only if we're not looking to extract a single file.
+        const tc::io::Path localPath = mOutputFile == "" ? l_path + *itr : l_path;
+
+		visitDir(v_path + *itr, localPath, extract_fs, print_fs);
 	}
 }

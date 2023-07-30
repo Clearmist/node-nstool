@@ -363,6 +363,40 @@ private:
 	std::vector<std::string> mOptRegex;
 };
 
+class SingleFileExtractionHandler : public tc::cli::OptionParser::IOptionHandler
+{
+public:
+	SingleFileExtractionHandler(std::string& param, const std::vector<std::string>& opts) :
+		mParam(param),
+		mOptStrings(opts),
+        mOptRegex()
+	{}
+
+	const std::vector<std::string>& getOptionStrings() const
+	{
+		return mOptStrings;
+	}
+
+    const std::vector<std::string>& getOptionRegexPatterns() const
+	{
+		return mOptRegex;
+	}
+
+	void processOption(const std::string& option, const std::vector<std::string>& params)
+	{
+		if (params.size() != 1)
+		{
+			throw tc::ArgumentOutOfRangeException(fmt::format("Option \"{:s}\" requires a parameter Give the name and extension of the file you want to extract.", option));
+		}
+
+        mParam = params[0];
+	}
+private:
+	std::string& mParam;
+	std::vector<std::string> mOptStrings;
+    std::vector<std::string> mOptRegex;
+};
+
 class InstructionTypeOptionHandler : public tc::cli::OptionParser::IOptionHandler
 {
 public:
@@ -624,6 +658,7 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 
 	// process input file type
 	opts.registerOptionHandler(std::shared_ptr<FileTypeOptionHandler>(new FileTypeOptionHandler(infile.filetype, { "-t", "--type" })));
+    opts.registerOptionHandler(std::shared_ptr<SingleFileExtractionHandler>(new SingleFileExtractionHandler(outfile.filename, { "--file" })));
 
 	// get user-provided keydata
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(mKeysetPath, {"-k", "--keyset"})));
@@ -784,7 +819,7 @@ void nstool::SettingsInitializer::usage_text() const
 {
 	fmt::print("{:s} v{:d}.{:d}.{:d} (C) {:s}\n", APP_NAME, VER_MAJOR, VER_MINOR, VER_PATCH, AUTHORS);
 	fmt::print("Built: {:s} {:s}\n\n", __TIME__, __DATE__);
-	fmt::print("Usage: {:s} [options... ] <file>\n", BIN_NAME);
+	fmt::print("Options are optional and are indicated in the examples using square brackets [].\nUsage: {:s} [options... ] <file>\n", BIN_NAME);
 	fmt::print("\n  General Options:\n");
 	fmt::print("      -d, --dev       Use devkit keyset.\n");
 	fmt::print("      -k, --keyset    Specify keyset file.\n");
@@ -796,21 +831,24 @@ void nstool::SettingsInitializer::usage_text() const
 	fmt::print("      -v, --verbose   Verbose output.\n");
     fmt::print("      --json          Format the output to JSON.\n");
 	fmt::print("\n  PFS0/HFS0 (PartitionFs), RomFs, NSP (Nintendo Submission Package)\n");
-	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] <file>\n", BIN_NAME);
+	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--file <file name>] <file>\n", BIN_NAME);
 	fmt::print("      --fstree        Print filesystem tree.\n");
 	fmt::print("      -x, --extract   Extract a file or directory to local filesystem.\n");
+    fmt::print("      --file          Extract only this file when using the extract option.\n");
 	fmt::print("\n  XCI (GameCard Image)\n");
-	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] <.xci file>\n", BIN_NAME);
+	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--file <file name>] <.xci file>\n", BIN_NAME);
 	fmt::print("      --fstree        Print filesystem tree.\n");
 	fmt::print("      -x, --extract   Extract a file or directory to local filesystem.\n");
+    fmt::print("      --file          Extract only this file when using the extract option.\n");
 	fmt::print("      --update        Extract \"update\" partition to directory. (Alias for \"-x /update <out path>\")\n");
 	fmt::print("      --logo          Extract \"logo\" partition to directory. (Alias for \"-x /logo <out path>\")\n");
 	fmt::print("      --normal        Extract \"normal\" partition to directory. (Alias for \"-x /normal <out path>\")\n");
 	fmt::print("      --secure        Extract \"secure\" partition to directory. (Alias for \"-x /secure <out path>\")\n");
 	fmt::print("\n  NCA (Nintendo Content Archive)\n");
-	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--bodykey <key> --titlekey <key> -tik <tik path> --basenca <.nca file>] <.nca file>\n", BIN_NAME);
+	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--file <file name>] [--bodykey <key> --titlekey <key> -tik <tik path> --basenca <.nca file>] <.nca file>\n", BIN_NAME);
 	fmt::print("      --fstree        Print filesystem tree.\n");
 	fmt::print("      -x, --extract   Extract a file or directory to local filesystem.\n");
+    fmt::print("      --file          Extract only this file when using the extract option.\n");
 	fmt::print("      --titlekey      Specify (encrypted) title key extracted from ticket.\n");
 	fmt::print("      --contentkey    Specify content key.\n");
 	fmt::print("      --tik           Specify ticket to source title key.\n");
@@ -829,9 +867,10 @@ void nstool::SettingsInitializer::usage_text() const
 	fmt::print("    {:s} [--kipdir <dir>] <file>\n", BIN_NAME);
 	fmt::print("      --kipdir        Extract embedded Initial Programs to directory.\n");
 	fmt::print("\n  ASET (Homebrew Asset Blob)\n");
-	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--icon <file> --nacp <file>] <file>\n", BIN_NAME);
+	fmt::print("    {:s} [--fstree] [-x [<virtual path>] <out path>] [--file <file name>] [--icon <file> --nacp <file>] <file>\n", BIN_NAME);
 	fmt::print("      --fstree        Print RomFs filesystem tree.\n");
 	fmt::print("      -x, --extract   Extract a file or directory from RomFs to local filesystem.\n");
+    fmt::print("      --file          Extract only this file when using the extract option.\n");
 	fmt::print("      --icon          Extract icon partition to file.\n");
 	fmt::print("      --nacp          Extract NACP partition to file.\n");
 }
