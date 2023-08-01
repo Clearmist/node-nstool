@@ -134,7 +134,7 @@ private:
 	void determine_filetype();
 	void usage_text() const;
 	void dump_keys() const;
-	void dump_rsa_key(const KeyBag::rsa_key_t& key, const std::string& label, size_t indent, bool expanded_key_data) const;
+	void dump_rsa_key(const KeyBag::rsa_key_t& key, const std::string& label, size_t indent, bool expanded_key_data, std::string keyGroup) const;
 
 	std::string mModuleLabel;
 

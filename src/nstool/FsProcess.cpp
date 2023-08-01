@@ -23,27 +23,23 @@ nstool::FsProcess::FsProcess() :
 
 void nstool::FsProcess::process()
 {
-	if (mInputFs == nullptr)
-	{
+	if (mInputFs == nullptr) {
 		throw tc::InvalidOperationException(mModuleLabel, "No input filesystem");
 	}
 
-	if (mShowFsInfo)
-	{
-		fmt::print("[{:s}]\n", mFsFormatName.isSet() ? mFsFormatName.get() : "FileSystem/Info");
-		for (auto itr = mProperties.begin(); itr != mProperties.end(); itr++)
-		{
-			fmt::print("  {:s}\n", *itr);
+	if (mShowFsInfo) {
+		handleLog(fmt::format("[{:s}]\n", mFsFormatName.isSet() ? mFsFormatName.get() : "FileSystem/Info"));
+
+        for (auto itr = mProperties.begin(); itr != mProperties.end(); itr++) {
+            handleLog(fmt::format("  {:s}\n", *itr));
 		}
 	}
 
-	if (mShowFsTree)
-	{
+	if (mShowFsTree) {
 		printFs();
 	}
 
-	if (mExtractJobs.empty() == false)
-	{
+	if (mExtractJobs.empty() == false) {
 		extractFs();
 	}
 }
@@ -248,8 +244,6 @@ void nstool::FsProcess::visitDir(const tc::io::Path& v_path, const tc::io::Path&
                 fmt::print(" {:s}\n", *itr);
             }
 		}
-
-        fmt::print("Current file {}. Looking for {}", *itr, mOutputFile);
 
 		if (extract_fs && (mOutputFile == "" || (mOutputFile == *itr))) {
 			handleLog(fmt::format("Saving {:s}\n", out_path.to_string()));

@@ -21,6 +21,8 @@ void handleError(std::string message);
 
 void handleLog(std::string message, const std::optional<std::string>& level = std::nullopt);
 
+void handlePrint(std::string message);
+
 #if defined(NODE_ADDON_API)
 // Napi::Env does not have a default constructor so initialize it with a null pointer.
 extern Napi::Env Environment;

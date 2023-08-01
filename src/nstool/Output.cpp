@@ -59,3 +59,9 @@ void handleLog(std::string message, const std::optional<std::string>& level = st
     fmt::print(message);
 }
 #endif
+
+void handlePrint(std::string message) {
+    if (!outputJSON) {
+        fmt::print(message);
+    }
+}

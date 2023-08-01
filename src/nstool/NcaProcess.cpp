@@ -223,8 +223,19 @@ void nstool::NcaProcess::generateNcaBodyEncryptionKeys()
 	{
 		if (mContentKey.aes_ctr.isSet())
 		{
-			fmt::print("[NCA Content Key]\n");
-			fmt::print("  AES-CTR Key: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mContentKey.aes_ctr.get().data(), mContentKey.aes_ctr.get().size(), true, ""));
+            if (outputJSON) {
+                nlohmann::json entry = {
+                    {"value", tc::cli::FormatUtil::formatBytesAsString(mContentKey.aes_ctr.get().data(), mContentKey.aes_ctr.get().size(), true, "")},
+                    {"type", ""},
+                    {"group", "NCAContent"},
+                    {"label", "AES-CTR"},
+                };
+
+                output["archive"]["keys"].push_back(entry);
+            } else {
+                fmt::print("[NCA Content Key]\n");
+                fmt::print("  AES-CTR Key: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mContentKey.aes_ctr.get().data(), mContentKey.aes_ctr.get().size(), true, ""));
+            }
 		}
 	}
 }
@@ -422,32 +433,25 @@ void nstool::NcaProcess::generatePartitionConfiguration()
 void nstool::NcaProcess::validateNcaSignatures()
 {
 	// validate signature[0]
-	if (mKeyCfg.nca_header_sign0_key.find(mHdr.getSignatureKeyGeneration()) != mKeyCfg.nca_header_sign0_key.end())
-	{
-		if (tc::crypto::VerifyRsa2048PssSha2256(mHdrBlock.signature_main.data(), mHdrHash.data(), mKeyCfg.nca_header_sign0_key[mHdr.getSignatureKeyGeneration()]) == false)
-		{
+	if (mKeyCfg.nca_header_sign0_key.find(mHdr.getSignatureKeyGeneration()) != mKeyCfg.nca_header_sign0_key.end()) {
+		if (tc::crypto::VerifyRsa2048PssSha2256(mHdrBlock.signature_main.data(), mHdrHash.data(), mKeyCfg.nca_header_sign0_key[mHdr.getSignatureKeyGeneration()]) == false) {
 			fmt::print("[WARNING] NCA Header Main Signature: FAIL\n");
 		}
-	}
-	else
-	{
+	} else {
 		fmt::print("[WARNING] NCA Header Main Signature: FAIL (could not load header key)\n");
 	}
 
 
 	// validate signature[1]
-	if (mHdr.getContentType() == pie::hac::nca::ContentType_Program)
-	{
+	if (mHdr.getContentType() == pie::hac::nca::ContentType_Program) {
 		try {
-			if (mPartitions[pie::hac::nca::ProgramContentPartitionIndex_Code].format_type == pie::hac::nca::FormatType_PartitionFs)
-			{
-				if (mPartitions[pie::hac::nca::ProgramContentPartitionIndex_Code].fs_reader != nullptr)
-				{
+			if (mPartitions[pie::hac::nca::ProgramContentPartitionIndex_Code].format_type == pie::hac::nca::FormatType_PartitionFs) {
+				if (mPartitions[pie::hac::nca::ProgramContentPartitionIndex_Code].fs_reader != nullptr) {
 					std::shared_ptr<tc::io::IStream> npdm_file;
-					try {
+
+                    try {
 						mPartitions[pie::hac::nca::ProgramContentPartitionIndex_Code].fs_reader->openFile(tc::io::Path(kNpdmExefsPath), tc::io::FileMode::Open, tc::io::FileAccess::Read, npdm_file);
-					}
-					catch (tc::io::FileNotFoundException&) {
+					} catch (tc::io::FileNotFoundException&) {
 						throw tc::Exception(fmt::format("\"{:s}\" not present in ExeFs", kNpdmExefsPath));
 					}
 
@@ -458,22 +462,16 @@ void nstool::NcaProcess::validateNcaSignatures()
 					npdm.setCliOutputMode(CliOutputMode(false, false, false, false, false));
 					npdm.process();
 
-					if (tc::crypto::VerifyRsa2048PssSha2256(mHdrBlock.signature_acid.data(), mHdrHash.data(), npdm.getMeta().getAccessControlInfoDesc().getContentArchiveHeaderSignature2Key()) == false)
-					{
+					if (tc::crypto::VerifyRsa2048PssSha2256(mHdrBlock.signature_acid.data(), mHdrHash.data(), npdm.getMeta().getAccessControlInfoDesc().getContentArchiveHeaderSignature2Key()) == false) {
 						throw tc::Exception("Bad signature");
 					}
-				}
-				else
-				{
+				} else {
 					throw tc::Exception("ExeFs was not mounted");
 				}
-			}
-			else
-			{
+			} else {
 				throw tc::Exception("No ExeFs partition");
 			}
-		}
-		catch (tc::Exception& e) {
+		} catch (tc::Exception& e) {
 			fmt::print("[WARNING] NCA Header ACID Signature: FAIL ({:s})\n", e.error());
 		}
 	}
@@ -550,75 +548,115 @@ void nstool::NcaProcess::displayHeader()
         }
 	}
 
-	if (mCliOutputMode.show_layout)
-	{
-		fmt::print("  Partitions:\n");
+	if (mCliOutputMode.show_layout) {
+		handlePrint("  Partitions:\n");
 
-		for (size_t i = 0; i < mHdr.getPartitionEntryList().size(); i++)
-		{
+		for (size_t i = 0; i < mHdr.getPartitionEntryList().size(); i++) {
 			uint32_t index = mHdr.getPartitionEntryList()[i].header_index;
 			sPartitionInfo& info = mPartitions[index];
-			if (info.size == 0) continue;
 
-			fmt::print("    {:d}:\n", index);
-			fmt::print("      Offset:      0x{:x}\n", info.offset);
-			fmt::print("      Size:        0x{:x}\n", info.size);
-			fmt::print("      Format Type: {:s}\n", pie::hac::ContentArchiveUtil::getFormatTypeAsString(info.format_type));
-			fmt::print("      Hash Type:   {:s}\n", pie::hac::ContentArchiveUtil::getHashTypeAsString(info.hash_type));
-			fmt::print("      Enc. Type:   {:s}\n", pie::hac::ContentArchiveUtil::getEncryptionTypeAsString(info.enc_type));
-			if (info.enc_type == pie::hac::nca::EncryptionType_AesCtr)
-			{
+            if (info.size == 0) continue;
+
+            if (outputJSON) {
+                output["archive"]["partitions"][index]["index"] = index;
+                output["archive"]["partitions"][index]["offset"] = fmt::format("0x{:x}", info.offset);
+                output["archive"]["partitions"][index]["size"] = fmt::format("0x{:x}", info.size);
+                output["archive"]["partitions"][index]["formatType"] = pie::hac::ContentArchiveUtil::getFormatTypeAsString(info.format_type);
+                output["archive"]["partitions"][index]["hashType"] = pie::hac::ContentArchiveUtil::getHashTypeAsString(info.hash_type);
+                output["archive"]["partitions"][index]["encodingType"] = pie::hac::ContentArchiveUtil::getEncryptionTypeAsString(info.enc_type);
+            } else {
+                fmt::print("    {:d}:\n", index);
+                fmt::print("      Offset:      0x{:x}\n", info.offset);
+                fmt::print("      Size:        0x{:x}\n", info.size);
+                fmt::print("      Format Type: {:s}\n", pie::hac::ContentArchiveUtil::getFormatTypeAsString(info.format_type));
+                fmt::print("      Hash Type:   {:s}\n", pie::hac::ContentArchiveUtil::getHashTypeAsString(info.hash_type));
+                fmt::print("      Enc. Type:   {:s}\n", pie::hac::ContentArchiveUtil::getEncryptionTypeAsString(info.enc_type));
+            }
+
+            if (info.enc_type == pie::hac::nca::EncryptionType_AesCtr) {
 				pie::hac::detail::aes_iv_t aes_ctr;
 				memcpy(aes_ctr.data(), info.aes_ctr.data(), aes_ctr.size());
 				tc::crypto::IncrementCounterAes128Ctr(aes_ctr.data(), info.offset>>4);
-				fmt::print("      AesCtr Counter:\n");
-				fmt::print("        {:s}\n", tc::cli::FormatUtil::formatBytesAsString(aes_ctr.data(), aes_ctr.size(), true, ""));
+
+                if (outputJSON) {
+                    output["archive"]["partitions"][index]["AesCtrCounter"] = tc::cli::FormatUtil::formatBytesAsString(aes_ctr.data(), aes_ctr.size(), true, "");
+                } else {
+                    fmt::print("      AesCtr Counter:\n");
+                    fmt::print("        {:s}\n", tc::cli::FormatUtil::formatBytesAsString(aes_ctr.data(), aes_ctr.size(), true, ""));
+                }
 			}
-			if (info.hash_type == pie::hac::nca::HashType_HierarchicalIntegrity)
-			{
+
+			if (info.hash_type == pie::hac::nca::HashType_HierarchicalIntegrity) {
 				auto hash_hdr = info.hierarchicalintegrity_hdr;
-				fmt::print("      HierarchicalIntegrity Header:\n");
-				for (size_t j = 0; j < hash_hdr.getLayerInfo().size(); j++)
-				{
-					if (j+1 == hash_hdr.getLayerInfo().size())
-					{
-						fmt::print("        Data Layer:\n");
+				handlePrint("      HierarchicalIntegrity Header:\n");
+
+				for (size_t j = 0; j < hash_hdr.getLayerInfo().size(); j++) {
+                    bool dataLayer = j+1 == hash_hdr.getLayerInfo().size();
+                    std::string layerLabel = dataLayer ? "data" : "hash";
+
+					if (dataLayer) {
+						handlePrint("        Data Layer:\n");
+					} else {
+						handlePrint(fmt::format("        Hash Layer {:d}:\n", j));
 					}
-					else
-					{
-						fmt::print("        Hash Layer {:d}:\n", j);
-					}
-					fmt::print("          Offset:          0x{:x}\n", hash_hdr.getLayerInfo()[j].offset);
-					fmt::print("          Size:            0x{:x}\n", hash_hdr.getLayerInfo()[j].size);
-					fmt::print("          BlockSize:       0x{:x}\n", hash_hdr.getLayerInfo()[j].block_size);
+
+                    if (outputJSON) {
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["index"] = j;
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["layer"] = layerLabel;
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["offset"] = fmt::format("0x{:x}", hash_hdr.getLayerInfo()[j].offset);
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["size"] = fmt::format("0x{:x}", hash_hdr.getLayerInfo()[j].size);
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["blockSize"] = fmt::format("0x{:x}", hash_hdr.getLayerInfo()[j].block_size);
+                    } else {
+                        fmt::print("          Offset:          0x{:x}\n", hash_hdr.getLayerInfo()[j].offset);
+                        fmt::print("          Size:            0x{:x}\n", hash_hdr.getLayerInfo()[j].size);
+                        fmt::print("          BlockSize:       0x{:x}\n", hash_hdr.getLayerInfo()[j].block_size);
+                    }
 				}
-				for (size_t j = 0; j < hash_hdr.getMasterHashList().size(); j++)
-				{
-					fmt::print("        Master Hash {:d}:\n", j);
-					fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data(), 0x10, true, ""));
-					fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data()+0x10, 0x10, true, ""));
+
+                for (size_t j = 0; j < hash_hdr.getMasterHashList().size(); j++) {
+                    if (outputJSON) {
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"]["masterHash"][j]["index"] = j;
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"]["masterHash"][j]["hash1"] = tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data(), 0x10, true, "");
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"]["masterHash"][j]["hash2"] = tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data()+0x10, 0x10, true, "");
+                    } else {
+                        fmt::print("        Master Hash {:d}:\n", j);
+                        fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data(), 0x10, true, ""));
+                        fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHashList()[j].data()+0x10, 0x10, true, ""));
+                    }
 				}
-			}
-			else if (info.hash_type == pie::hac::nca::HashType_HierarchicalSha256)
-			{
+			} else if (info.hash_type == pie::hac::nca::HashType_HierarchicalSha256) {
 				auto hash_hdr = info.hierarchicalsha256_hdr;
-				fmt::print("      HierarchicalSha256 Header:\n");
-				fmt::print("        Master Hash:\n");
-				fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data(), 0x10, true, ""));
-				fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data()+0x10, 0x10, true, ""));
-				fmt::print("        HashBlockSize:     0x{:x}\n", hash_hdr.getHashBlockSize());
-				for (size_t j = 0; j < hash_hdr.getLayerInfo().size(); j++)
-				{
-					if (j+1 == hash_hdr.getLayerInfo().size())
-					{
-						fmt::print("        Data Layer:\n");
+
+                if (outputJSON) {
+                    output["archive"]["partitions"][index]["hierarchicalSha256Header"]["masterHash"]["hash1"] = tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data(), 0x10, true, "");
+                    output["archive"]["partitions"][index]["hierarchicalSha256Header"]["masterHash"]["hash2"] = tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data()+0x10, 0x10, true, "");
+                    output["archive"]["partitions"][index]["hierarchicalSha256Header"]["hashBlockSize"] = fmt::format("0x{:x}", hash_hdr.getHashBlockSize());
+                } else {
+                    fmt::print("      HierarchicalSha256 Header:\n");
+                    fmt::print("        Master Hash:\n");
+                    fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data(), 0x10, true, ""));
+                    fmt::print("          {:s}\n", tc::cli::FormatUtil::formatBytesAsString(hash_hdr.getMasterHash().data()+0x10, 0x10, true, ""));
+                    fmt::print("        HashBlockSize:     0x{:x}\n", hash_hdr.getHashBlockSize());
+                }
+
+				for (size_t j = 0; j < hash_hdr.getLayerInfo().size(); j++) {
+                    std::string layerLabel = j+1 == hash_hdr.getLayerInfo().size() ? "data" : "hash";
+
+					if (j+1 == hash_hdr.getLayerInfo().size()) {
+						handlePrint("        Data Layer:\n");
+					} else {
+						handlePrint(fmt::format("        Hash Layer {:d}:\n", j));
 					}
-					else
-					{
-						fmt::print("        Hash Layer {:d}:\n", j);
-					}
-					fmt::print("          Offset:          0x{:x}\n", hash_hdr.getLayerInfo()[j].offset);
-					fmt::print("          Size:            0x{:x}\n", hash_hdr.getLayerInfo()[j].size);
+
+                    if (outputJSON) {
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["index"] = j;
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["layer"] = layerLabel;
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["offset"] = fmt::format("0x{:x}", hash_hdr.getLayerInfo()[j].offset);
+                        output["archive"]["partitions"][index]["hierarchicalIntegrityHeader"][j]["size"] = fmt::format("0x{:x}", hash_hdr.getLayerInfo()[j].size);
+                    } else {
+                        fmt::print("          Offset:          0x{:x}\n", hash_hdr.getLayerInfo()[j].offset);
+                        fmt::print("          Size:            0x{:x}\n", hash_hdr.getLayerInfo()[j].size);
+                    }
 				}
 			}
 		}

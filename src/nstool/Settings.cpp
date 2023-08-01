@@ -2,6 +2,7 @@
 #include "types.h"
 #include "version.h"
 #include "util.h"
+#include "Output.hpp"
 
 #include <tc/cli.h>
 #include <tc/os/Environment.h>
@@ -544,39 +545,39 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 {
 	// parse input arguments
 	parse_args(args);
-	if (infile.path.isNull())
-		throw tc::ArgumentException(mModuleLabel, "No input file was specified.");
+
+    if (infile.path.isNull()) {
+        throw tc::ArgumentException(mModuleLabel, "No input file was specified.");
+    }
 
 	// determine CLI output mode
 	opt.cli_output_mode.show_basic_info = true;
 
-    if (mVerbose)
-	{
+    if (mVerbose) {
 		opt.cli_output_mode.show_extended_info = true;
 		opt.cli_output_mode.show_layout = true;
 		opt.cli_output_mode.show_keydata = true;
 	}
 
-    if (mShowKeydata)
-	{
+    if (mShowKeydata) {
 		opt.cli_output_mode.show_keydata = true;
 	}
 
-    if (mShowLayout)
-	{
+    if (mShowLayout) {
 		opt.cli_output_mode.show_layout = true;
 	}
 
     if (mJSON) {
         opt.cli_output_mode.show_json = true;
+
+        outputJSON = true;
     }
 
 	// locate key file, if not specfied
-	if (mKeysetPath.isNull())
-	{
+	if (mKeysetPath.isNull()) {
 		std::string home_path_str;
-		if (tc::os::getEnvVar("HOME", home_path_str) || tc::os::getEnvVar("USERPROFILE", home_path_str))
-		{
+
+		if (tc::os::getEnvVar("HOME", home_path_str) || tc::os::getEnvVar("USERPROFILE", home_path_str)) {
 			tc::io::Path keyfile_path = tc::io::Path(home_path_str);
 			keyfile_path.push_back(".switch");
 			keyfile_path.push_back(opt.is_dev ? "dev.keys" : "prod.keys");
@@ -589,8 +590,7 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 			catch (tc::io::FileNotFoundException&) {
 				fmt::print("[WARNING] Failed to load \"{}\" keyfile. Maybe specify it with \"-k <path>\"?\n", opt.is_dev ? "dev.keys" : "prod.keys");
 			}
-		}
-		else {
+		} else {
 			fmt::print("[WARNING] Failed to located \"{}\" keyfile. Maybe specify it with \"-k <path>\"?\n", opt.is_dev ? "dev.keys" : "prod.keys");
 		}
 	}
@@ -601,17 +601,16 @@ nstool::SettingsInitializer::SettingsInitializer(const std::vector<std::string>&
 	opt.keybag.fallback_content_key = mNcaContentKey;
 
 	// dump keys if requires
-	if (mShowKeydata) // but not opt.cli_output_mode.show_keydata, since this that enabled by toggling -v,--verbose, personally I don't think a summary of imported keydata should be included in verbose output.
-	{
+    // but not opt.cli_output_mode.show_keydata, since this that enabled by toggling -v,--verbose, personally I don't think a summary of imported keydata should be included in verbose output.
+	if (mShowKeydata) {
 		dump_keys();
 	}
 
 	// determine filetype if not manually specified
-	if (infile.filetype == FILE_TYPE_ERROR)
-	{
+	if (infile.filetype == FILE_TYPE_ERROR) {
 		determine_filetype();
-		if (infile.filetype == FILE_TYPE_ERROR)
-		{
+
+		if (infile.filetype == FILE_TYPE_ERROR) {
 			throw tc::ArgumentException(mModuleLabel, "Input file type was undetermined.");
 		}
 	}
@@ -697,7 +696,6 @@ void nstool::SettingsInitializer::parse_args(const std::vector<std::string>& arg
 	// aset options
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(aset.icon_extract_path, { "--icon" })));
 	opts.registerOptionHandler(std::shared_ptr<SingleParamPathOptionHandler>(new SingleParamPathOptionHandler(aset.nacp_extract_path, { "--nacp" })));
-
 
 	// process option
 	opts.processOptions(args, 1, args.size() - 2);
@@ -877,141 +875,288 @@ void nstool::SettingsInitializer::usage_text() const
 
 void nstool::SettingsInitializer::dump_keys() const
 {
-	fmt::print("[KeyConfiguration]\n");
-	fmt::print("  NCA Keys:\n");
-	for (auto itr = opt.keybag.nca_header_sign0_key.begin(); itr != opt.keybag.nca_header_sign0_key.end(); itr++)
-	{
-		dump_rsa_key(itr->second, fmt::format("Header0-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info);
+    handleLog("Dumping keys.");
+
+    nlohmann::json entry = {};
+
+    handlePrint("[KeyConfiguration]\n");
+    handlePrint("  NCA Keys:\n");
+
+	for (auto itr = opt.keybag.nca_header_sign0_key.begin(); itr != opt.keybag.nca_header_sign0_key.end(); itr++) {
+		dump_rsa_key(itr->second, fmt::format("Header0-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info, "NCA");
 	}
-	for (auto itr = opt.keybag.acid_sign_key.begin(); itr != opt.keybag.acid_sign_key.end(); itr++)
-	{
-		dump_rsa_key(itr->second, fmt::format("Acid-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info);
+
+	for (auto itr = opt.keybag.acid_sign_key.begin(); itr != opt.keybag.acid_sign_key.end(); itr++) {
+		dump_rsa_key(itr->second, fmt::format("Acid-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info, "NCA");
 	}
-	if (opt.keybag.nca_header_key.isSet())
-	{
-		fmt::print("    Header-EncryptionKey:\n");
-		fmt::print("      Key0: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[0].data(), opt.keybag.nca_header_key.get()[0].size(), true, ""));
-		fmt::print("      Key1: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[1].data(), opt.keybag.nca_header_key.get()[1].size(), true, ""));
+
+	if (opt.keybag.nca_header_key.isSet()) {
+        handlePrint("    Header-EncryptionKey:\n");
+
+        if (outputJSON) {
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[0].data(), opt.keybag.nca_header_key.get()[0].size(), true, "")},
+                {"type", ""},
+                {"group", "NCA"},
+                {"label", "Header-EncryptionKey-00"},
+            };
+
+            output["keys"].push_back(entry);
+
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[0].data(), opt.keybag.nca_header_key.get()[1].size(), true, "")},
+                {"type", ""},
+                {"group", "NCA"},
+                {"label", "Header-EncryptionKey-01"},
+            };
+
+            output["keys"].push_back(entry);
+        } else {
+            fmt::print("      Key0: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[0].data(), opt.keybag.nca_header_key.get()[0].size(), true, ""));
+            fmt::print("      Key1: {:s}\n", tc::cli::FormatUtil::formatBytesAsString(opt.keybag.nca_header_key.get()[1].data(), opt.keybag.nca_header_key.get()[1].size(), true, ""));
+        }
 	}
-	std::vector<std::string> kaek_label = {"Application", "Ocean", "System"};
-	for (size_t kaek_index = 0; kaek_index < opt.keybag.nca_key_area_encryption_key.size(); kaek_index++)
-	{
-		for (auto itr = opt.keybag.nca_key_area_encryption_key[kaek_index].begin(); itr != opt.keybag.nca_key_area_encryption_key[kaek_index].end(); itr++)
-		{
-			fmt::print("    KeyAreaEncryptionKey-{:s}-{:02x}:\n      {:s}\n", kaek_label[kaek_index], itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+
+    std::vector<std::string> kaek_label = {"Application", "Ocean", "System"};
+
+    for (size_t kaek_index = 0; kaek_index < opt.keybag.nca_key_area_encryption_key.size(); kaek_index++) {
+		for (auto itr = opt.keybag.nca_key_area_encryption_key[kaek_index].begin(); itr != opt.keybag.nca_key_area_encryption_key[kaek_index].end(); itr++) {
+            if (outputJSON) {
+                entry = {
+                    {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                    {"type", ""},
+                    {"group", "NCA"},
+                    {"label", fmt::format("KeyAreaEncryptionKey-{:s}-{:02x}", kaek_label[kaek_index], itr->first)},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("    KeyAreaEncryptionKey-{:s}-{:02x}:\n      {:s}\n", kaek_label[kaek_index], itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+            }
 		}
 	}
-	for (size_t kaek_index = 0; kaek_index < opt.keybag.nca_key_area_encryption_key_hw.size(); kaek_index++)
-	{
-		for (auto itr = opt.keybag.nca_key_area_encryption_key_hw[kaek_index].begin(); itr != opt.keybag.nca_key_area_encryption_key_hw[kaek_index].end(); itr++)
-		{
-			fmt::print("    KeyAreaEncryptionKeyHw-{:s}-{:02x}:\n      {:s}\n", kaek_label[kaek_index], itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+
+    for (size_t kaek_index = 0; kaek_index < opt.keybag.nca_key_area_encryption_key_hw.size(); kaek_index++) {
+		for (auto itr = opt.keybag.nca_key_area_encryption_key_hw[kaek_index].begin(); itr != opt.keybag.nca_key_area_encryption_key_hw[kaek_index].end(); itr++) {
+            if (outputJSON) {
+                entry = {
+                    {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                    {"type", ""},
+                    {"group", "NCA"},
+                    {"label", fmt::format("KeyAreaEncryptionKeyHw-{:s}-{:02x}", kaek_label[kaek_index], itr->first)},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("    KeyAreaEncryptionKeyHw-{:s}-{:02x}:\n      {:s}\n", kaek_label[kaek_index], itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+            }
 		}
 	}
-	fmt::print("  NRR Keys:\n");
-	for (auto itr = opt.keybag.nrr_certificate_sign_key.begin(); itr != opt.keybag.nrr_certificate_sign_key.end(); itr++)
-	{
-		dump_rsa_key(itr->second, fmt::format("Certificate-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info);
-	}
-	fmt::print("  XCI Keys:\n");
-	if (opt.keybag.xci_header_sign_key.isSet())
-	{
-		dump_rsa_key(opt.keybag.xci_header_sign_key.get(), fmt::format("Header-SignatureKey"), 4, opt.cli_output_mode.show_extended_info);
-	}
-	for (auto itr = opt.keybag.xci_header_key.begin(); itr != opt.keybag.xci_header_key.end(); itr++)
-	{
-		fmt::print("    ExtendedHeader-EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
-	}
-	if (opt.keybag.xci_cert_sign_key.isSet())
-	{
-		dump_rsa_key(opt.keybag.xci_cert_sign_key.get(), fmt::format("CERT-SignatureKey"), 4, opt.cli_output_mode.show_extended_info);
+
+    handlePrint("  NRR Keys:\n");
+
+    for (auto itr = opt.keybag.nrr_certificate_sign_key.begin(); itr != opt.keybag.nrr_certificate_sign_key.end(); itr++) {
+		dump_rsa_key(itr->second, fmt::format("Certificate-SignatureKey-{:02x}", itr->first), 4, opt.cli_output_mode.show_extended_info, "NRR");
 	}
 
-	fmt::print("  Package1 Keys:\n");
-	for (auto itr = opt.keybag.pkg1_key.begin(); itr != opt.keybag.pkg1_key.end(); itr++)
-	{
-		fmt::print("    EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+    handlePrint("  XCI Keys:\n");
+
+    if (opt.keybag.xci_header_sign_key.isSet()) {
+		dump_rsa_key(opt.keybag.xci_header_sign_key.get(), fmt::format("Header-SignatureKey"), 4, opt.cli_output_mode.show_extended_info, "XCI");
 	}
 
-	fmt::print("  Package2 Keys:\n");
-	if (opt.keybag.pkg2_sign_key.isSet())
-	{
-		dump_rsa_key(opt.keybag.pkg2_sign_key.get(), fmt::format("Header-SignatureKey"), 4, opt.cli_output_mode.show_extended_info);
-	}
-	for (auto itr = opt.keybag.pkg2_key.begin(); itr != opt.keybag.pkg2_key.end(); itr++)
-	{
-		fmt::print("    EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+    for (auto itr = opt.keybag.xci_header_key.begin(); itr != opt.keybag.xci_header_key.end(); itr++) {
+        if (outputJSON) {
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                {"type", ""},
+                {"group", "XCI"},
+                {"label", fmt::format("ExtendedHeader-EncryptionKey-{:02x}", itr->first)},
+            };
+
+            output["keys"].push_back(entry);
+        } else {
+            fmt::print("    ExtendedHeader-EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+        }
 	}
 
-	fmt::print("  ETicket Keys:\n");
-	for (auto itr = opt.keybag.etik_common_key.begin(); itr != opt.keybag.etik_common_key.end(); itr++)
-	{
-		fmt::print("    CommonKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+    if (opt.keybag.xci_cert_sign_key.isSet()) {
+		dump_rsa_key(opt.keybag.xci_cert_sign_key.get(), fmt::format("CERT-SignatureKey"), 4, opt.cli_output_mode.show_extended_info, "XCI");
 	}
 
-	fmt::print("  BroadOn Signer Profiles:\n");
-	for (auto itr = opt.keybag.broadon_signer.begin(); itr != opt.keybag.broadon_signer.end(); itr++)
-	{
-		fmt::print("    {:s}:\n", itr->first);
-		fmt::print("      SignType: ");
+	handlePrint("  Package1 Keys:\n");
+
+    for (auto itr = opt.keybag.pkg1_key.begin(); itr != opt.keybag.pkg1_key.end(); itr++) {
+        if (outputJSON) {
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                {"type", ""},
+                {"group", "Package1"},
+                {"label", fmt::format("EncryptionKey-{:02x}", itr->first)},
+            };
+
+            output["keys"].push_back(entry);
+        } else {
+            fmt::print("    EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+        }
+	}
+
+	handlePrint("  Package2 Keys:\n");
+
+    if (opt.keybag.pkg2_sign_key.isSet()) {
+		dump_rsa_key(opt.keybag.pkg2_sign_key.get(), fmt::format("Header-SignatureKey"), 4, opt.cli_output_mode.show_extended_info, "Package2");
+	}
+
+    for (auto itr = opt.keybag.pkg2_key.begin(); itr != opt.keybag.pkg2_key.end(); itr++) {
+        if (outputJSON) {
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                {"type", ""},
+                {"group", "Package2"},
+                {"label", fmt::format("EncryptionKey-{:02x}", itr->first)},
+            };
+
+            output["keys"].push_back(entry);
+        } else {
+            fmt::print("    EncryptionKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+        }
+	}
+
+	handlePrint("  ETicket Keys:\n");
+
+    for (auto itr = opt.keybag.etik_common_key.begin(); itr != opt.keybag.etik_common_key.end(); itr++) {
+        if (outputJSON) {
+            entry = {
+                {"value", tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, "")},
+                {"type", ""},
+                {"group", "ETicket"},
+                {"label", fmt::format("CommonKey-{:02x}", itr->first)},
+            };
+
+            output["keys"].push_back(entry);
+        } else {
+            fmt::print("    CommonKey-{:02x}:\n      {:s}\n", itr->first, tc::cli::FormatUtil::formatBytesAsString(itr->second.data(), itr->second.size(), true, ""));
+        }
+	}
+
+	handlePrint("  BroadOn Signer Profiles:\n");
+
+    for (auto itr = opt.keybag.broadon_signer.begin(); itr != opt.keybag.broadon_signer.end(); itr++) {
+		handlePrint(fmt::format("    {:s}:\n", itr->first));
+		handlePrint("      SignType: ");
+
+        std::string signType = "Unknown";
+
 		switch(itr->second.key_type) {
 			case pie::hac::es::sign::SIGN_ALGO_RSA2048:
-				fmt::print("RSA-2048\n");
+                signType = "RSA-2048";
 				break;
 			case pie::hac::es::sign::SIGN_ALGO_RSA4096:
-				fmt::print("RSA-4096\n");
+				signType = "RSA-4096";
 				break;
 			case pie::hac::es::sign::SIGN_ALGO_ECDSA240:
-				fmt::print("ECDSA-240\n");
+				signType = "ECDSA-240";
 				break;
 			default:
 				fmt::print("Unknown\n");
 		}
+
+        handlePrint(fmt::format("{}\n", signType));
+
 		switch(itr->second.key_type) {
 			case pie::hac::es::sign::SIGN_ALGO_RSA2048:
 			case pie::hac::es::sign::SIGN_ALGO_RSA4096:
-				dump_rsa_key(itr->second.rsa_key, "RsaKey", 6, opt.cli_output_mode.show_extended_info);
+				dump_rsa_key(itr->second.rsa_key, "RsaKey", 6, opt.cli_output_mode.show_extended_info, "BroadOn Signer Profile");
 				break;
 			case pie::hac::es::sign::SIGN_ALGO_ECDSA240:
 			default:
 				break;
 		}
+
+        if (outputJSON) {
+            entry = {
+                {"signType", signType},
+                {"label", itr->first},
+            };
+
+            output["broadOnSignerProfiles"].push_back(entry);
+        }
 	}
 }
 
-void nstool::SettingsInitializer::dump_rsa_key(const KeyBag::rsa_key_t& key, const std::string& label, size_t indent, bool expanded_key_data) const
+void nstool::SettingsInitializer::dump_rsa_key(const KeyBag::rsa_key_t& key, const std::string& label, size_t indent, bool expanded_key_data, std::string keyGroup) const
 {
+    nlohmann::json entry = {};
 	std::string indent_str;
 
 	indent_str.clear();
-	for (size_t i = 0; i < indent; i++)
-	{
+
+    for (size_t i = 0; i < indent; i++) {
 		indent_str += " ";
 	}
 
-	fmt::print("{:s}{:s}:\n", indent_str, label);
-	if (key.n.size() > 0)
-	{
-		if (expanded_key_data)
-		{
-			fmt::print("{:s}  Modulus:\n", indent_str);
-			fmt::print("{:s}    {:s}", indent_str, tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(key.n.data(), key.n.size(), true, "", 0x10, indent + 4, false));
-		}
-		else
-		{
-			fmt::print("{:s}  Modulus: {:s}\n", indent_str, getTruncatedBytesString(key.n.data(), key.n.size()));
+	handlePrint(fmt::format("{:s}{:s}:\n", indent_str, label));
+
+    if (key.n.size() > 0) {
+		if (expanded_key_data) {
+            if (outputJSON) {
+                entry = {
+                    {"value", tc::cli::FormatUtil::formatBytesAsString(key.n.data(), key.n.size(), true, "")},
+                    {"type", "modulus"},
+                    {"group", keyGroup},
+                    {"label", label},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("{:s}  Modulus:\n", indent_str);
+                fmt::print("{:s}    {:s}", indent_str, tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(key.n.data(), key.n.size(), true, "", 0x10, indent + 4, false));
+            }
+
+		} else {
+            if (outputJSON) {
+                entry = {
+                    {"value", getTruncatedBytesString(key.n.data(), key.n.size())},
+                    {"type", "modulus"},
+                    {"group", keyGroup},
+                    {"label", label},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("{:s}  Modulus: {:s}\n", indent_str, getTruncatedBytesString(key.n.data(), key.n.size()));
+            }
 		}
 	}
-	if (key.d.size() > 0)
-	{
-		if (expanded_key_data)
-		{
-			fmt::print("{:s}  Private Exponent:\n", indent_str);
-			fmt::print("{:s}    {:s}", indent_str, tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(key.d.data(), key.d.size(), true, "", 0x10, indent + 4, false));
-		}
-		else
-		{
-			fmt::print("{:s}  Private Exponent: {:s}\n", indent_str, getTruncatedBytesString(key.d.data(), key.d.size()));
+
+    if (key.d.size() > 0) {
+		if (expanded_key_data) {
+            if (outputJSON) {
+                entry = {
+                    {"value", tc::cli::FormatUtil::formatBytesAsString(key.d.data(), key.d.size(), true, "")},
+                    {"type", "privateExponent"},
+                    {"group", keyGroup},
+                    {"label", label},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("{:s}  Private Exponent:\n", indent_str);
+			    fmt::print("{:s}    {:s}", indent_str, tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(key.d.data(), key.d.size(), true, "", 0x10, indent + 4, false));
+            }
+		} else {
+            if (outputJSON) {
+                entry = {
+                    {"value", getTruncatedBytesString(key.d.data(), key.d.size())},
+                    {"type", "privateExponent"},
+                    {"group", keyGroup},
+                    {"label", label},
+                };
+
+                output["keys"].push_back(entry);
+            } else {
+                fmt::print("{:s}  Private Exponent: {:s}\n", indent_str, getTruncatedBytesString(key.d.data(), key.d.size()));
+            }
 		}
 	}
 }

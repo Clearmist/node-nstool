@@ -59,4 +59,4 @@ node_modules/
 
 # Testing files
 test.js
-testdata.json
+test*.json

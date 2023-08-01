@@ -9,6 +9,18 @@ const nodeNSTool = {
     };
   },
   run: function(options, parameters) {
+    if (typeof options?.showKeys !== 'undefined') {
+      parameters.push('--showkeys');
+    }
+
+    if (typeof options?.showLayout !== 'undefined') {
+      parameters.push('--showlayout');
+    }
+
+    if (typeof options?.verbose !== 'undefined') {
+      parameters.push('--verbose');
+    }
+
     // Make sure that the user provided a source file to process.
     if (typeof options?.source === 'undefined' || typeof options.source !== 'string') {
       return this.error('Provide a source file using the "source" option.');

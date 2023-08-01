@@ -1,12 +1,12 @@
 #include "PfsProcess.h"
 #include "util.h"
+#include "Output.hpp"
 
 #include <pietendo/hac/PartitionFsUtil.h>
 #include <tc/io/LocalFileSystem.h>
 
 #include <tc/io/VirtualFileSystem.h>
 #include <pietendo/hac/PartitionFsSnapshotGenerator.h>
-
 
 nstool::PfsProcess::PfsProcess() :
 	mModuleName("nstool::PfsProcess"),
@@ -66,10 +66,16 @@ void nstool::PfsProcess::process()
 	mFsProcess.setInputFileSystem(mFileSystem);
 
 	// set properties for FsProcess
-	mFsProcess.setFsProperties({
-		fmt::format("Type:        {:s}", pie::hac::PartitionFsUtil::getFsTypeAsString(mPfs.getFsType())),
-		fmt::format("FileNum:     {:d}", mPfs.getFileList().size())
-	});
+    if (outputJSON) {
+        output["archive"]["fileSystem"]["type"]["int"] = mPfs.getFsType();
+        output["archive"]["fileSystem"]["type"]["string"] = pie::hac::PartitionFsUtil::getFsTypeAsString(mPfs.getFsType());
+        output["archive"]["fileSystem"]["fileCount"] = fmt::format("{:d}", mPfs.getFileList().size());
+    } else {
+        mFsProcess.setFsProperties({
+            fmt::format("Type:        {:s}", pie::hac::PartitionFsUtil::getFsTypeAsString(mPfs.getFsType())),
+            fmt::format("FileNum:     {:d}", mPfs.getFileList().size())
+        });
+    }
 
 	mFsProcess.process();
 }
