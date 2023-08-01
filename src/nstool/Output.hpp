@@ -13,6 +13,8 @@ extern bool outputJSON;
 // True if this program has been compiled as a Node addon module.
 extern bool nodeAddon;
 
+void initializeOutput();
+
 /**
  * This function will throw a JavaScript error if the program is compiled as a Node addon module.
  * Otherwise it will print the error message to the command line.

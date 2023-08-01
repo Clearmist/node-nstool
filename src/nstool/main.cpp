@@ -57,6 +57,8 @@ int umain(const std::vector<std::string>& args, const std::vector<std::string>& 
 {
     handleLog("Starting the program.");
 
+    initializeOutput();
+
 	try
 	{
 		nstool::Settings set = nstool::SettingsInitializer(args);

@@ -19,6 +19,16 @@ json output = {
 
 bool outputJSON = false;
 
+void initializeOutput() {
+    output = {
+        {"error", false},
+        {"errorMessage", ""},
+        {"log", json::array()},
+    };
+
+    outputJSON = false;
+}
+
 #if defined(NODE_ADDON_API)
 // Napi::Env does not have a default constructor so initialize it with a null pointer.
 Napi::Env Environment = nullptr;
