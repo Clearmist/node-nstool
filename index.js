@@ -21,6 +21,11 @@ const nodeNSTool = {
       parameters.push('--verbose');
     }
 
+    if (typeof options?.type !== 'undefined') {
+      parameters.push('--type');
+      parameters.push(options.type.toLowerCase());
+    }
+
     // Make sure that the user provided a source file to process.
     if (typeof options?.source === 'undefined' || typeof options.source !== 'string') {
       return this.error('Provide a source file using the "source" option.');
@@ -75,8 +80,6 @@ const nodeNSTool = {
     const parameters = [
       'nstool',
       '--json',
-      '--type',
-      'nca',
       '--extract',
       options.outputDirectory,
     ];
