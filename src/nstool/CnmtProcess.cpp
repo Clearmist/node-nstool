@@ -75,7 +75,9 @@ void nstool::CnmtProcess::displayCnmt()
     handlePrint("[ContentMeta]\n");
 
     if (outputJSON) {
-        output["meta"]["titleId"] = fmt::format("0x{:016x}", mCnmt.getTitleId());
+        output["meta"]["titleId"]["int"] = mCnmt.getTitleId();
+        output["meta"]["titleId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getTitleId());
+        output["meta"]["titleId"]["string"] = fmt::format("{:016x}", mCnmt.getTitleId());
         output["meta"]["version"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getTitleVersion());
         output["meta"]["version"]["int"] = mCnmt.getTitleVersion();
         output["meta"]["type"]["string"] = pie::hac::ContentMetaUtil::getContentMetaTypeAsString(mCnmt.getContentMetaType());
@@ -135,7 +137,9 @@ void nstool::CnmtProcess::displayCnmt()
                 output["meta"]["extendedHeader"]["requiredApplicationVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion();
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion());
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion();
-                output["meta"]["extendedHeader"]["patchId"] = fmt::format("0x{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
+                output["meta"]["extendedHeader"]["patchId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
+                output["meta"]["extendedHeader"]["patchId"]["string"] = fmt::format("{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
+                output["meta"]["extendedHeader"]["patchId"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getPatchId();
             } else {
                 fmt::print("  ApplicationExtendedHeader:\n");
                 fmt::print("    RequiredApplicationVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion()), mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion());
@@ -148,7 +152,9 @@ void nstool::CnmtProcess::displayCnmt()
                 output["meta"]["extendedHeader"]["type"] = "patch meta";
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion());
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion();
-                output["meta"]["extendedHeader"]["applicationId"] = fmt::format("0x{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getPatchMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  PatchMetaExtendedHeader:\n");
                 fmt::print("    RequiredSystemVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion()), mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion());
@@ -160,7 +166,9 @@ void nstool::CnmtProcess::displayCnmt()
                 output["meta"]["extendedHeader"]["type"] = "addon content meta";
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion());
                 output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion();
-                output["meta"]["extendedHeader"]["applicationId"] = fmt::format("0x{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  AddOnContentMetaExtendedHeader:\n");
                 fmt::print("    RequiredApplicationVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion()), mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion());
@@ -170,7 +178,9 @@ void nstool::CnmtProcess::displayCnmt()
 		case (pie::hac::cnmt::ContentMetaType_Delta):
             if (outputJSON) {
                 output["meta"]["extendedHeader"]["type"] = "delta meta";
-                output["meta"]["extendedHeader"]["applicationId"] = fmt::format("0x{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
+                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getDeltaMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  DeltaMetaExtendedHeader:\n");
                 fmt::print("    ApplicationId:         0x{:016x}\n", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
