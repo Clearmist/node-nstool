@@ -24,7 +24,7 @@
 
 std::string FileTypes[16] = {
     "ERROR",
-    "GAMECAARD",
+    "GAMECARD",
     "NSP",
     "PARTITIONFS",
     "ROMFS",
