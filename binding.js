@@ -14,13 +14,7 @@ switch (arg[0]) {
   case 'include_dirs':
     list = [
       './src/nstool',
-      './src/deps/libfmt/include',
-      './src/deps/liblz4/include',
-      './src/deps/libmbedtls/include',
-      './src/deps/libpietendo/include',
-      './src/deps/libtoolchain/include',
-      './src/deps/nlohmann',
-      './src/deps/date'
+      './src/include',
     ];
     break;
   case 'libraries':
