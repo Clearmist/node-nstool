@@ -2,7 +2,7 @@
 #include <napi.h>
 #endif
 #include <optional>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 // The object that will be stringified into JSON.
 extern nlohmann::json output;

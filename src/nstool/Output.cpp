@@ -6,8 +6,8 @@
 #endif
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
-#include <json.hpp>
-#include "date.h"
+#include <nlohmann/json.hpp>
+#include <date/date.h>
 
 using json = nlohmann::json;
 
