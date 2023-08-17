@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 project(liblz4)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../library/liblz4)
 set(PROJECT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../src/deps/liblz4)
 
 file(GLOB SOURCE_FILES ${PROJECT_DIRECTORY}/src/*.c)
 
-add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

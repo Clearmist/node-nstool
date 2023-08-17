@@ -1,16 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 project(pietendo)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../library/libpietendo)
 set(PROJECT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../src/deps/libpietendo)
 
 file(GLOB_RECURSE SOURCE_FILES ${PROJECT_DIRECTORY}/src/*.cpp)
 
-add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME}
-    PUBLIC ../libfmt/build/Release/fmt.lib
-    PUBLIC ../libtoolchain/build/Release/tc.lib
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../libfmt/build/Release/fmt.lib
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../libtoolchain/build/Release/tc.lib
 )
 
 target_include_directories(${PROJECT_NAME}
