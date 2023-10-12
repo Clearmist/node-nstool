@@ -6,7 +6,10 @@
                 'src/node-nstool.cpp',
                 "<!@(node binding.js sources)"
             ],
-            'cflags_cc': [],
+            'cflags': [
+                '/std:c++17',
+                '-std=c++17'
+            ],
             'include_dirs': [
                 "<!(node -p \"require('node-addon-api').include_dir\")",
                 "<!@(node binding.js include_dirs)"
