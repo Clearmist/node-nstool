@@ -1,6 +1,7 @@
 #if defined(NODE_ADDON_API)
 #include <napi.h>
 #endif
+#include <cstdlib>
 #include <optional>
 #include <nlohmann/json.hpp>
 

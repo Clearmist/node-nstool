@@ -20,6 +20,18 @@
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")",
             ],
+            'copies': [
+                {
+                    'destination': '<(module_root_dir)/build/Release',
+                    'files': [
+                        '<(module_root_dir)/library/libfmt/build/Release/fmt.dll',
+                        '<(module_root_dir)/library/liblz4/build/Release/liblz4.dll',
+                        '<(module_root_dir)/library/libmbedtls/build/Release/libmbedtls.dll',
+                        '<(module_root_dir)/library/libtoolchain/build/Release/tc.dll',
+                        '<(module_root_dir)/library/libpietendo/build/Release/pietendo.dll'
+                    ]
+                }
+            ],
             'defines': [
                 'NODE_ADDON_API',
             ],
