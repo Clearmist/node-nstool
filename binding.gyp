@@ -10,6 +10,9 @@
                 '/std:c++17',
                 '-std=c++17'
             ],
+            'ldflags' : [
+                '-Wl,-static'
+            ],
             'include_dirs': [
                 "<!(node -p \"require('node-addon-api').include_dir\")",
                 "<!@(node binding.js include_dirs)"
@@ -24,11 +27,11 @@
                 {
                     'destination': '<(module_root_dir)/build/Release',
                     'files': [
-                        '<(module_root_dir)/library/libfmt/build/Release/fmt.dll',
-                        '<(module_root_dir)/library/liblz4/build/Release/liblz4.dll',
-                        '<(module_root_dir)/library/libmbedtls/build/Release/libmbedtls.dll',
-                        '<(module_root_dir)/library/libtoolchain/build/Release/tc.dll',
-                        '<(module_root_dir)/library/libpietendo/build/Release/pietendo.dll'
+                        '<(module_root_dir)/library/libfmt/build/Release/fmt.lib',
+                        '<(module_root_dir)/library/liblz4/build/Release/liblz4.lib',
+                        '<(module_root_dir)/library/libmbedtls/build/Release/libmbedtls.lib',
+                        '<(module_root_dir)/library/libtoolchain/build/Release/tc.lib',
+                        '<(module_root_dir)/library/libpietendo/build/Release/pietendo.lib'
                     ]
                 }
             ],

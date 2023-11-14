@@ -7,7 +7,7 @@ set(PROJECT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../src/deps/libfmt)
 
 file(GLOB SOURCE_FILES ${PROJECT_DIRECTORY}/src/*.cc)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

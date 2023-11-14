@@ -1,5 +1,5 @@
 const fs = require('fs');
-const nstool = require('./build/Release/node-nstool.node');
+const nstool = require('node-gyp-build')(__dirname)
 
 const nodeNSTool = {
   error: function(errorMessage) {
@@ -80,6 +80,7 @@ const nodeNSTool = {
     const parameters = [
       'nstool',
       '--json',
+      '--fstree',
       '--extract',
       options.outputDirectory,
     ];

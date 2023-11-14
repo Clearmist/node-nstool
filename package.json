@@ -11,13 +11,14 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "node-gyp rebuild --silent",
+    "build": "npm run build-libraries && node-gyp rebuild --silent",
     "build-libraries": "npm-run-all --parallel libfmt liblz4 libmbedtls --serial libtoolchain libpietendo",
     "libfmt": "cd src/deps/libfmt && cmake-js rebuild -d ../../../library/libfmt -o ../../../library",
     "liblz4": "cd src/deps/liblz4 && cmake-js rebuild -d ../../../library/liblz4 -o ../../../library",
     "libmbedtls": "cd src/deps/libmbedtls && cmake-js rebuild -d ../../../library/libmbedtls -o ../../../library",
     "libtoolchain": "cd src/deps/libtoolchain && cmake-js rebuild -d ../../../library/libtoolchain -o ../../../library",
     "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild -d ../../../library/libpietendo -o ../../../library",
+    "nstool": "cd src/nstool && cmake-js rebuild -d ../../library/nstool -o ../../library",
     "clean": "node-gyp clean"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",

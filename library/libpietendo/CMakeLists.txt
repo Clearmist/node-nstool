@@ -7,7 +7,7 @@ set(PROJECT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../src/deps/libpietendo)
 
 file(GLOB_RECURSE SOURCE_FILES ${PROJECT_DIRECTORY}/src/*.cpp)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../libfmt/build/Release/fmt.lib
