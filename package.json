@@ -19,7 +19,9 @@
     "libtoolchain": "cd src/deps/libtoolchain && cmake-js rebuild -d ../../../library/libtoolchain -o ../../../library",
     "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild -d ../../../library/libpietendo -o ../../../library",
     "nstool": "cd src/nstool && cmake-js rebuild -d ../../library/nstool -o ../../library",
-    "clean": "node-gyp clean"
+    "clean": "node-gyp clean",
+    "preinstall": "echo Building libraries && npm run build-libraries",
+    "install": "echo Building addon && node-gyp rebuild"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",
   "repository": {
