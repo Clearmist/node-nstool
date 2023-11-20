@@ -20,7 +20,6 @@
     "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild",
     "nstool": "cd src/nstool && cmake-js rebuild -d ../../library/nstool -o ../../library",
     "clean": "node-gyp clean",
-    "preinstall": "echo Building libraries && npm run build-libraries",
     "install": "echo Building addon && node-gyp rebuild"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",
