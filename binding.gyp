@@ -27,11 +27,11 @@
                 {
                     'destination': '<(module_root_dir)/build/Release',
                     'files': [
-                        '<(module_root_dir)/library/libfmt/build/Release/fmt.lib',
-                        '<(module_root_dir)/library/liblz4/build/Release/liblz4.lib',
-                        '<(module_root_dir)/library/libmbedtls/build/Release/libmbedtls.lib',
-                        '<(module_root_dir)/library/libtoolchain/build/Release/tc.lib',
-                        '<(module_root_dir)/library/libpietendo/build/Release/pietendo.lib'
+                        '<(module_root_dir)/library/fmt.lib',
+                        '<(module_root_dir)/library/liblz4.lib',
+                        '<(module_root_dir)/library/libmbedtls.lib',
+                        '<(module_root_dir)/library/tc.lib',
+                        '<(module_root_dir)/library/pietendo.lib'
                     ]
                 }
             ],
