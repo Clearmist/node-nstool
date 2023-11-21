@@ -18,7 +18,6 @@
     "libmbedtls": "cd src/deps/libmbedtls && cmake-js rebuild",
     "libtoolchain": "cd src/deps/libtoolchain && cmake-js rebuild",
     "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild",
-    "nstool": "cd src/nstool && cmake-js rebuild -d ../../library/nstool -o ../../library",
     "clean": "node-gyp clean",
     "install": "echo Building addon && node-gyp rebuild"
   },
@@ -35,7 +34,7 @@
   "dependencies": {
     "cmake-js": "^7.2.1",
     "node-addon-api": "^7.0.0",
-    "node-gyp-build": "^4.6.1"
+    "node-gyp-build": "^4.7.0"
   },
   "devDependencies": {
     "node-gyp": "^10.0.1",
@@ -43,12 +42,10 @@
   },
   "gypfile": true,
   "binary": {
-    "napi_versions": [
-      3
-    ]
+    "napi_versions": [8]
   },
   "config": {
     "runtime": "napi",
-    "target": 3
+    "target": 8
   }
 }

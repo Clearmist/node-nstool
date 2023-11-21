@@ -7,7 +7,17 @@
                 "<!@(node binding.js sources)"
             ],
             'cflags': [
-                '/std:c++17',
+                '-std=c++17',
+            ],
+            'cflags_cc': [
+                '-std=c++17'
+            ],
+            'cflags!': [
+                '-fno-exceptions',
+                '-std=c++17'
+            ],
+            "cflags_cc!": [
+                '-fno-exceptions',
                 '-std=c++17'
             ],
             'ldflags' : [
@@ -38,6 +48,29 @@
             'defines': [
                 'NODE_ADDON_API',
             ],
+            'msvs_settings': {
+                'VCCLCompilerTool': {
+                    'AdditionalOptions': ['-std:c++17', '-permissive'],
+                    'ExceptionHandling': 1
+                },
+            },
+            'xcode_settings': {
+                'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+                'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+                'CLANG_CXX_LIBRARY': 'libc++',
+                'CLANG_CXX_LANGUAGE_STANDARD': 'c++17',
+                'MACOSX_DEPLOYMENT_TARGET': '10.9',
+                'OTHER_CFLAGS': [
+                    '-arch x86_64',
+                    '-arch arm64',
+                    '-std=c++17',
+                    '-stdlib=libc++'
+                ],
+                'OTHER_LDFLAGS': [
+                    '-arch x86_64',
+                    '-arch arm64',
+                ],
+            },
             'conditions': [
                 [
                     "OS=='win'",
@@ -46,33 +79,12 @@
                             '_HAS_EXCEPTIONS=1',
                             '_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS=1'
                         ],
-                        'msvs_settings': {
-                            'VCCLCompilerTool': {
-                                'AdditionalOptions': ['-std:c++17', '-permissive'],
-                                'ExceptionHandling': 1
-                            },
-                        }
                     }
                 ],
                 [
                     "OS=='mac'",
                     {
                         'cflags+': ['-fvisibility=hidden'],
-                        'xcode_settings': {
-                            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
-                            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-                            'CLANG_CXX_LIBRARY': 'libc++',
-                            'CLANG_CXX_LANGUAGE_STANDARD': 'c++17',
-                            'MACOSX_DEPLOYMENT_TARGET': '10.9',
-                            'OTHER_CFLAGS': [
-                                '-arch x86_64',
-                                '-arch arm64',
-                            ],
-                            'OTHER_LDFLAGS': [
-                                '-arch x86_64',
-                                '-arch arm64',
-                            ],
-                        },
                     }
                 ],
             ],

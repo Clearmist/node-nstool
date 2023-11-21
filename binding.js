@@ -15,6 +15,11 @@ switch (arg[0]) {
     list = [
       './src/nstool',
       './src/include',
+      './src/deps/libfmt/include',
+      './src/deps/liblz4/include',
+      './src/deps/libmbedtls/include',
+      './src/deps/libpietendo/include',
+      './src/deps/libtoolchain/include',
     ];
     break;
   case 'libraries':
