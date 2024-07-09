@@ -331,8 +331,11 @@ void nstool::NcaProcess::generatePartitionConfiguration()
 				}
 				else if (info.enc_type == pie::hac::nca::EncryptionType_AesCtr)
 				{
-					if (mContentKey.aes_ctr.isNull())
-						throw tc::Exception(mModuleName, "AES-CTR Key was not determined");
+					if (mContentKey.aes_ctr.isNull()) {
+                        handleLog("AES-CTR key was not determined (AES-CTR). Perhaps you need to dump a newer prod.keys file.", "error");
+
+                        throw tc::Exception(mModuleName, "AES-CTR key was not determined");
+                    }
 
 					// get partition key
 					pie::hac::detail::aes128_key_t partition_key = mContentKey.aes_ctr.get();
@@ -346,8 +349,11 @@ void nstool::NcaProcess::generatePartitionConfiguration()
 				}
 				else if (info.enc_type == pie::hac::nca::EncryptionType_AesCtrEx)
 				{
-					if (mContentKey.aes_ctr.isNull())
-						throw tc::Exception(mModuleName, "AES-CTR Key was not determined");
+					if (mContentKey.aes_ctr.isNull()) {
+                        handleLog("AES-CTR key was not determined (AES-CTR-EX). Perhaps you need to dump a newer prod.keys file.", "error");
+
+                        throw tc::Exception(mModuleName, "AES-CTR key was not determined");
+                    }
 
 					// get partition key
 					pie::hac::detail::aes128_key_t partition_key = mContentKey.aes_ctr.get();

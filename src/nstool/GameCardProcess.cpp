@@ -1,4 +1,5 @@
 #include "GameCardProcess.h"
+#include "Output.hpp"
 
 #include <tc/crypto.h>
 #include <tc/io/IOUtil.h>
@@ -135,99 +136,116 @@ void nstool::GameCardProcess::displayHeader()
 {
 	const pie::hac::sGcHeader* raw_hdr = (const pie::hac::sGcHeader*)mHdr.getBytes().data();
 
-	fmt::print("[GameCard/Header]\n");
-	fmt::print("  CardHeaderVersion:      {:d}\n", mHdr.getCardHeaderVersion());
-	fmt::print("  RomSize:                {:s}", pie::hac::GameCardUtil::getRomSizeAsString((pie::hac::gc::RomSize)mHdr.getRomSizeType()));
+    if (outputJSON) {
+        output["archive"]["header"]["version"] = mHdr.getCardHeaderVersion();
+        output["archive"]["header"]["romSize"]["string"] = pie::hac::GameCardUtil::getRomSizeAsString((pie::hac::gc::RomSize)mHdr.getRomSizeType());
+        output["archive"]["header"]["romSize"]["hex"] = fmt::format("0x{:x}", mHdr.getRomSizeType());
+        output["archive"]["header"]["packageID"] = fmt::format("0x{:16x}", mHdr.getPackageId());
+        output["archive"]["header"]["flagLength"] = fmt::format("0x{:02x}", *((byte_t*)&raw_hdr->flags));
 
-    if (mCliOutputMode.show_extended_info) {
-        fmt::print(" (0x{:x})", mHdr.getRomSizeType());
-    }
-
-	fmt::print("\n");
-	fmt::print("  PackageId:              0x{:016x}\n", mHdr.getPackageId());
-	fmt::print("  Flags:                  0x{:02x}\n", *((byte_t*)&raw_hdr->flags));
-
-    for (auto itr = mHdr.getFlags().begin(); itr != mHdr.getFlags().end(); itr++) {
-		fmt::print("    {:s}\n", pie::hac::GameCardUtil::getHeaderFlagsAsString((pie::hac::gc::HeaderFlags)*itr));
-	}
-
-	if (mCliOutputMode.show_extended_info) {
-		fmt::print("  KekIndex:               {:s} ({:d})\n", pie::hac::GameCardUtil::getKekIndexAsString((pie::hac::gc::KekIndex)mHdr.getKekIndex()), mHdr.getKekIndex());
-		fmt::print("  TitleKeyDecIndex:       {:d}\n", mHdr.getTitleKeyDecIndex());
-		fmt::print("  InitialData:\n");
-		fmt::print("    Hash:\n");
-		fmt::print("      {:s}", tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(mHdr.getInitialDataHash().data(), mHdr.getInitialDataHash().size(), true, "", 0x10, 6, false));
-	}
-
-    if (mCliOutputMode.show_extended_info) {
-		fmt::print("  Extended Header AesCbc IV:\n");
-		fmt::print("    {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mHdr.getAesCbcIv().data(), mHdr.getAesCbcIv().size(), true, ""));
-	}
-
-    fmt::print("  SelSec:                 0x{:x}\n", mHdr.getSelSec());
-	fmt::print("  SelT1Key:               0x{:x}\n", mHdr.getSelT1Key());
-	fmt::print("  SelKey:                 0x{:x}\n", mHdr.getSelKey());
-
-    if (mCliOutputMode.show_layout) {
-		fmt::print("  RomAreaStartPage:       0x{:x}", mHdr.getRomAreaStartPage());
-
-        if (mHdr.getRomAreaStartPage() != (uint32_t)(-1)) {
-            fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getRomAreaStartPage()));
+        for (auto itr = mHdr.getFlags().begin(); itr != mHdr.getFlags().end(); itr++) {
+            output["archive"]["header"]["romSize"]["flags"].push_back(pie::hac::GameCardUtil::getHeaderFlagsAsString((pie::hac::gc::HeaderFlags)*itr));
         }
 
-		fmt::print("\n");
-
-		fmt::print("  BackupAreaStartPage:    0x{:x}", mHdr.getBackupAreaStartPage());
-
-        if (mHdr.getBackupAreaStartPage() != (uint32_t)(-1)) {
-            fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getBackupAreaStartPage()));
-        }
-
-		fmt::print("\n");
-
-		fmt::print("  ValidDataEndPage:       0x{:x}", mHdr.getValidDataEndPage());
-
-        if (mHdr.getValidDataEndPage() != (uint32_t)(-1)) {
-            fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getValidDataEndPage()));
-        }
-
-		fmt::print("\n");
-
-		fmt::print("  LimArea:                0x{:x}", mHdr.getLimAreaPage());
-
-        if (mHdr.getLimAreaPage() != (uint32_t)(-1)) {
-            fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getLimAreaPage()));
-        }
-
-		fmt::print("\n");
-
-		fmt::print("  PartitionFs Header:\n");
-		fmt::print("    Offset:               0x{:x}\n", mHdr.getPartitionFsAddress());
-		fmt::print("    Size:                 0x{:x}\n", mHdr.getPartitionFsSize());
+        output["archive"]["header"]["kekIndex"]["string"] = pie::hac::GameCardUtil::getKekIndexAsString((pie::hac::gc::KekIndex)mHdr.getKekIndex());
+        output["archive"]["header"]["kekIndex"]["decimal"] = mHdr.getKekIndex();
+        output["archive"]["header"]["titleKeyDecIndex"] = mHdr.getTitleKeyDecIndex();
+        output["archive"]["header"]["initialData"]["hash"] = tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(mHdr.getInitialDataHash().data(), mHdr.getInitialDataHash().size(), true, "", 0x10, 6, false);
+        output["archive"]["header"]["extendedHeaderAESCBCIV"] = tc::cli::FormatUtil::formatBytesAsString(mHdr.getAesCbcIv().data(), mHdr.getAesCbcIv().size(), true, "");
+        output["archive"]["header"]["selSec"] = fmt::format("0x{:x}", mHdr.getSelSec());
+        output["archive"]["header"]["selT1Key"] = fmt::format("0x{:x}", mHdr.getSelT1Key());
+        output["archive"]["header"]["selKey"] = fmt::format("0x{:x}", mHdr.getSelKey());
+    } else {
+        fmt::print("[GameCard/Header]\n");
+        fmt::print("  CardHeaderVersion:      {:d}\n", mHdr.getCardHeaderVersion());
+        fmt::print("  RomSize:                {:s}", pie::hac::GameCardUtil::getRomSizeAsString((pie::hac::gc::RomSize)mHdr.getRomSizeType()));
 
         if (mCliOutputMode.show_extended_info) {
-			fmt::print("    Hash:\n");
-			fmt::print("      {:s}", tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(mHdr.getPartitionFsHash().data(), mHdr.getPartitionFsHash().size(), true, "", 0x10, 6, false));
-		}
-	}
+            fmt::print(" (0x{:x})", mHdr.getRomSizeType());
+        }
 
+        fmt::print("\n");
+        fmt::print("  PackageId:              0x{:016x}\n", mHdr.getPackageId());
+        fmt::print("  Flags:                  0x{:02x}\n", *((byte_t*)&raw_hdr->flags));
 
-	if (mProccessExtendedHeader) {
-		fmt::print("[GameCard/ExtendedHeader]\n");
-		fmt::print("  FwVersion:              v{:d} ({:s})\n", mHdr.getFwVersion(), pie::hac::GameCardUtil::getCardFwVersionDescriptionAsString((pie::hac::gc::FwVersion)mHdr.getFwVersion()));
-		fmt::print("  AccCtrl1:               0x{:x}\n", mHdr.getAccCtrl1());
-		fmt::print("    CardClockRate:        {:s}\n", pie::hac::GameCardUtil::getCardClockRateAsString((pie::hac::gc::CardClockRate)mHdr.getAccCtrl1()));
-		fmt::print("  Wait1TimeRead:          0x{:x}\n", mHdr.getWait1TimeRead());
-		fmt::print("  Wait2TimeRead:          0x{:x}\n", mHdr.getWait2TimeRead());
-		fmt::print("  Wait1TimeWrite:         0x{:x}\n", mHdr.getWait1TimeWrite());
-		fmt::print("  Wait2TimeWrite:         0x{:x}\n", mHdr.getWait2TimeWrite());
-		fmt::print("  SdkAddon Version:       {:s} (v{:d})\n", pie::hac::ContentArchiveUtil::getSdkAddonVersionAsString(mHdr.getFwMode()), mHdr.getFwMode());
-		fmt::print("  CompatibilityType:      {:s} ({:d})\n", pie::hac::GameCardUtil::getCompatibilityTypeAsString((pie::hac::gc::CompatibilityType)mHdr.getCompatibilityType()), mHdr.getCompatibilityType());
-		fmt::print("  Update Partition Info:\n");
-		fmt::print("    CUP Version:          {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mHdr.getUppVersion()), mHdr.getUppVersion());
-		fmt::print("    CUP TitleId:          0x{:016x}\n", mHdr.getUppId());
-		fmt::print("    CUP Digest:           {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mHdr.getUppHash().data(), mHdr.getUppHash().size(), true, ""));
-	}
+        for (auto itr = mHdr.getFlags().begin(); itr != mHdr.getFlags().end(); itr++) {
+            fmt::print("    {:s}\n", pie::hac::GameCardUtil::getHeaderFlagsAsString((pie::hac::gc::HeaderFlags)*itr));
+        }
+
+        if (mCliOutputMode.show_extended_info) {
+            fmt::print("  KekIndex:               {:s} ({:d})\n", pie::hac::GameCardUtil::getKekIndexAsString((pie::hac::gc::KekIndex)mHdr.getKekIndex()), mHdr.getKekIndex());
+            fmt::print("  TitleKeyDecIndex:       {:d}\n", mHdr.getTitleKeyDecIndex());
+            fmt::print("  InitialData:\n");
+            fmt::print("    Hash:\n");
+            fmt::print("      {:s}", tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(mHdr.getInitialDataHash().data(), mHdr.getInitialDataHash().size(), true, "", 0x10, 6, false));
+            fmt::print("  Extended Header AesCbc IV:\n");
+            fmt::print("    {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mHdr.getAesCbcIv().data(), mHdr.getAesCbcIv().size(), true, ""));
+        }
+
+        fmt::print("  SelSec:                 0x{:x}\n", mHdr.getSelSec());
+        fmt::print("  SelT1Key:               0x{:x}\n", mHdr.getSelT1Key());
+        fmt::print("  SelKey:                 0x{:x}\n", mHdr.getSelKey());
+
+        if (mCliOutputMode.show_layout) {
+            fmt::print("  RomAreaStartPage:       0x{:x}", mHdr.getRomAreaStartPage());
+
+            if (mHdr.getRomAreaStartPage() != (uint32_t)(-1)) {
+                fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getRomAreaStartPage()));
+            }
+
+            fmt::print("\n");
+
+            fmt::print("  BackupAreaStartPage:    0x{:x}", mHdr.getBackupAreaStartPage());
+
+            if (mHdr.getBackupAreaStartPage() != (uint32_t)(-1)) {
+                fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getBackupAreaStartPage()));
+            }
+
+            fmt::print("\n");
+
+            fmt::print("  ValidDataEndPage:       0x{:x}", mHdr.getValidDataEndPage());
+
+            if (mHdr.getValidDataEndPage() != (uint32_t)(-1)) {
+                fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getValidDataEndPage()));
+            }
+
+            fmt::print("\n");
+
+            fmt::print("  LimArea:                0x{:x}", mHdr.getLimAreaPage());
+
+            if (mHdr.getLimAreaPage() != (uint32_t)(-1)) {
+                fmt::print(" (0x{:x})", pie::hac::GameCardUtil::blockToAddr(mHdr.getLimAreaPage()));
+            }
+
+            fmt::print("\n");
+
+            fmt::print("  PartitionFs Header:\n");
+            fmt::print("    Offset:               0x{:x}\n", mHdr.getPartitionFsAddress());
+            fmt::print("    Size:                 0x{:x}\n", mHdr.getPartitionFsSize());
+
+            if (mCliOutputMode.show_extended_info) {
+                fmt::print("    Hash:\n");
+                fmt::print("      {:s}", tc::cli::FormatUtil::formatBytesAsStringWithLineLimit(mHdr.getPartitionFsHash().data(), mHdr.getPartitionFsHash().size(), true, "", 0x10, 6, false));
+            }
+        }
+
+        if (mProccessExtendedHeader) {
+            fmt::print("[GameCard/ExtendedHeader]\n");
+            fmt::print("  FwVersion:              v{:d} ({:s})\n", mHdr.getFwVersion(), pie::hac::GameCardUtil::getCardFwVersionDescriptionAsString((pie::hac::gc::FwVersion)mHdr.getFwVersion()));
+            fmt::print("  AccCtrl1:               0x{:x}\n", mHdr.getAccCtrl1());
+            fmt::print("    CardClockRate:        {:s}\n", pie::hac::GameCardUtil::getCardClockRateAsString((pie::hac::gc::CardClockRate)mHdr.getAccCtrl1()));
+            fmt::print("  Wait1TimeRead:          0x{:x}\n", mHdr.getWait1TimeRead());
+            fmt::print("  Wait2TimeRead:          0x{:x}\n", mHdr.getWait2TimeRead());
+            fmt::print("  Wait1TimeWrite:         0x{:x}\n", mHdr.getWait1TimeWrite());
+            fmt::print("  Wait2TimeWrite:         0x{:x}\n", mHdr.getWait2TimeWrite());
+            fmt::print("  SdkAddon Version:       {:s} (v{:d})\n", pie::hac::ContentArchiveUtil::getSdkAddonVersionAsString(mHdr.getFwMode()), mHdr.getFwMode());
+            fmt::print("  CompatibilityType:      {:s} ({:d})\n", pie::hac::GameCardUtil::getCompatibilityTypeAsString((pie::hac::gc::CompatibilityType)mHdr.getCompatibilityType()), mHdr.getCompatibilityType());
+            fmt::print("  Update Partition Info:\n");
+            fmt::print("    CUP Version:          {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mHdr.getUppVersion()), mHdr.getUppVersion());
+            fmt::print("    CUP TitleId:          0x{:016x}\n", mHdr.getUppId());
+            fmt::print("    CUP Digest:           {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mHdr.getUppHash().data(), mHdr.getUppHash().size(), true, ""));
+        }
+    }
 }
 
 bool nstool::GameCardProcess::validateRegionOfFile(int64_t offset, int64_t len, const byte_t* test_hash, bool use_salt, byte_t salt)
