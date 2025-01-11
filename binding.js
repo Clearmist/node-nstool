@@ -20,6 +20,7 @@ switch (arg[0]) {
       './src/deps/libmbedtls/include',
       './src/deps/libpietendo/include',
       './src/deps/libtoolchain/include',
+      './node_modules/node-api-headers/include',
     ];
     break;
   case 'libraries':

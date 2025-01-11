@@ -1,5 +1,5 @@
 const fs = require('fs');
-const nstool = require('node-gyp-build')(__dirname)
+const nstool = require('node-gyp-build')(__dirname);
 
 const nodeNSTool = {
   error: function(errorMessage) {

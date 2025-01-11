@@ -1,4 +1,7 @@
 {
+    'variables': {
+        'openssl_fips': ''
+    },
     'targets': [
         {
             'target_name': 'node-nstool',
@@ -24,14 +27,16 @@
                 '-Wl,-static'
             ],
             'include_dirs': [
+                "<!(node -p \"require('node-api-headers').include_dir\")",
                 "<!(node -p \"require('node-addon-api').include_dir\")",
+                "<!@(node -p \"require('node-addon-api').include\")",
                 "<!@(node binding.js include_dirs)"
             ],
             'libraries': [
                 '<!@(node binding.js libraries)'
             ],
             'dependencies': [
-                "<!(node -p \"require('node-addon-api').gyp\")",
+                "<!(node -p \"require('node-addon-api').targets\"):node_addon_api",
             ],
             'copies': [
                 {
@@ -50,7 +55,10 @@
             ],
             'msvs_settings': {
                 'VCCLCompilerTool': {
-                    'AdditionalOptions': ['-std:c++17', '-permissive'],
+                    'AdditionalOptions': [
+                        '-std:c++17',
+                        '-permissive'
+                    ],
                     'ExceptionHandling': 1
                 },
             },
