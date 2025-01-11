@@ -12,7 +12,7 @@
   "main": "index.js",
   "scripts": {
     "install": "node-gyp-build",
-    "prebuild": "prebuildify --all --strip --napi",
+    "prebuild": "prebuildify --napi",
     "build": "node-gyp rebuild",
     "build-libraries": "npm-run-all --parallel libfmt liblz4 libmbedtls --serial libtoolchain libpietendo",
     "libfmt": "cd src/deps/libfmt && cmake-js rebuild",

@@ -36,6 +36,7 @@
                 '<!@(node binding.js libraries)'
             ],
             'dependencies': [
+                "<!(node -p \"require('node-addon-api').gyp\")",
                 "<!(node -p \"require('node-addon-api').targets\"):node_addon_api",
             ],
             'copies': [
