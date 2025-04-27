@@ -75,14 +75,14 @@ void nstool::CnmtProcess::displayCnmt()
     handlePrint("[ContentMeta]\n");
 
     if (outputJSON) {
-        output["meta"]["titleId"]["int"] = mCnmt.getTitleId();
-        output["meta"]["titleId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getTitleId());
-        output["meta"]["titleId"]["string"] = fmt::format("{:016x}", mCnmt.getTitleId());
-        output["meta"]["version"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getTitleVersion());
-        output["meta"]["version"]["int"] = mCnmt.getTitleVersion();
-        output["meta"]["type"]["string"] = pie::hac::ContentMetaUtil::getContentMetaTypeAsString(mCnmt.getContentMetaType());
-        output["meta"]["type"]["int"] = (uint32_t)mCnmt.getContentMetaType();
-        output["meta"]["attributes"] = fmt::format("0x{:x}", *((byte_t*)&cnmt_hdr->attributes));
+        output["archive"]["titleId"]["int"] = mCnmt.getTitleId();
+        output["archive"]["titleId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getTitleId());
+        output["archive"]["titleId"]["string"] = fmt::format("{:016x}", mCnmt.getTitleId());
+        output["archive"]["version"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getTitleVersion());
+        output["archive"]["version"]["int"] = mCnmt.getTitleVersion();
+        output["archive"]["type"]["string"] = pie::hac::ContentMetaUtil::getContentMetaTypeAsString(mCnmt.getContentMetaType());
+        output["archive"]["type"]["int"] = (uint32_t)mCnmt.getContentMetaType();
+        output["archive"]["attributes"] = fmt::format("0x{:x}", *((byte_t*)&cnmt_hdr->attributes));
     } else {
         fmt::print("  TitleId:               0x{:016x}\n", mCnmt.getTitleId());
         fmt::print("  Version:               {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getTitleVersion()), mCnmt.getTitleVersion());
@@ -101,7 +101,7 @@ void nstool::CnmtProcess::displayCnmt()
 
         for (auto itr = attribute_list.begin(); itr != attribute_list.end(); itr++) {
             if (outputJSON) {
-                output["meta"]["attributeList"].push_back(*itr);
+                output["archive"]["attributeList"].push_back(*itr);
             } else {
                 fmt::print("{:s}",*itr);
 
@@ -117,12 +117,12 @@ void nstool::CnmtProcess::displayCnmt()
     handlePrint("\n");
 
     if (outputJSON) {
-        output["meta"]["storageId"]["string"] = pie::hac::ContentMetaUtil::getStorageIdAsString(mCnmt.getStorageId());
-        output["meta"]["storageId"]["int"] = (uint32_t)mCnmt.getStorageId();
-        output["meta"]["contentInstallType"]["string"] = pie::hac::ContentMetaUtil::getContentInstallTypeAsString(mCnmt.getContentInstallType());
-        output["meta"]["contentInstallType"]["int"] = (uint32_t)mCnmt.getContentInstallType();
-        output["meta"]["requiredDownloadSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getRequiredDownloadSystemVersion());
-        output["meta"]["requiredDownloadSystemVersion"]["int"] = mCnmt.getRequiredDownloadSystemVersion();
+        output["archive"]["storageId"]["string"] = pie::hac::ContentMetaUtil::getStorageIdAsString(mCnmt.getStorageId());
+        output["archive"]["storageId"]["int"] = (uint32_t)mCnmt.getStorageId();
+        output["archive"]["contentInstallType"]["string"] = pie::hac::ContentMetaUtil::getContentInstallTypeAsString(mCnmt.getContentInstallType());
+        output["archive"]["contentInstallType"]["int"] = (uint32_t)mCnmt.getContentInstallType();
+        output["archive"]["requiredDownloadSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getRequiredDownloadSystemVersion());
+        output["archive"]["requiredDownloadSystemVersion"]["int"] = mCnmt.getRequiredDownloadSystemVersion();
     } else {
         fmt::print("  StorageId:             {:s} ({:d})\n", pie::hac::ContentMetaUtil::getStorageIdAsString(mCnmt.getStorageId()), (uint32_t)mCnmt.getStorageId());
         fmt::print("  ContentInstallType:    {:s} ({:d})\n", pie::hac::ContentMetaUtil::getContentInstallTypeAsString(mCnmt.getContentInstallType()),(uint32_t)mCnmt.getContentInstallType());
@@ -132,14 +132,14 @@ void nstool::CnmtProcess::displayCnmt()
     switch (mCnmt.getContentMetaType()) {
 		case (pie::hac::cnmt::ContentMetaType_Application):
             if (outputJSON) {
-                output["meta"]["extendedHeader"]["type"] = "application";
-                output["meta"]["extendedHeader"]["requiredApplicationVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion());
-                output["meta"]["extendedHeader"]["requiredApplicationVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion();
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion());
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion();
-                output["meta"]["extendedHeader"]["patchId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
-                output["meta"]["extendedHeader"]["patchId"]["string"] = fmt::format("{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
-                output["meta"]["extendedHeader"]["patchId"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getPatchId();
+                output["archive"]["extendedHeader"]["type"] = "application";
+                output["archive"]["extendedHeader"]["requiredApplicationVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion());
+                output["archive"]["extendedHeader"]["requiredApplicationVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion();
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion());
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getRequiredSystemVersion();
+                output["archive"]["extendedHeader"]["patchId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
+                output["archive"]["extendedHeader"]["patchId"]["string"] = fmt::format("{:016x}", mCnmt.getApplicationMetaExtendedHeader().getPatchId());
+                output["archive"]["extendedHeader"]["patchId"]["int"] = mCnmt.getApplicationMetaExtendedHeader().getPatchId();
             } else {
                 fmt::print("  ApplicationExtendedHeader:\n");
                 fmt::print("    RequiredApplicationVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion()), mCnmt.getApplicationMetaExtendedHeader().getRequiredApplicationVersion());
@@ -149,12 +149,12 @@ void nstool::CnmtProcess::displayCnmt()
 			break;
 		case (pie::hac::cnmt::ContentMetaType_Patch):
             if (outputJSON) {
-                output["meta"]["extendedHeader"]["type"] = "patch meta";
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion());
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion();
-                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getPatchMetaExtendedHeader().getApplicationId();
+                output["archive"]["extendedHeader"]["type"] = "patch meta";
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion());
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion();
+                output["archive"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getPatchMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getPatchMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  PatchMetaExtendedHeader:\n");
                 fmt::print("    RequiredSystemVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion()), mCnmt.getPatchMetaExtendedHeader().getRequiredSystemVersion());
@@ -163,12 +163,12 @@ void nstool::CnmtProcess::displayCnmt()
 			break;
 		case (pie::hac::cnmt::ContentMetaType_AddOnContent):
             if (outputJSON) {
-                output["meta"]["extendedHeader"]["type"] = "addon content meta";
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion());
-                output["meta"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion();
-                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId();
+                output["archive"]["extendedHeader"]["type"] = "addon content meta";
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["string"] = pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion());
+                output["archive"]["extendedHeader"]["requiredSystemVersion"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion();
+                output["archive"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getAddOnContentMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  AddOnContentMetaExtendedHeader:\n");
                 fmt::print("    RequiredApplicationVersion: {:s} (v{:d})\n", pie::hac::ContentMetaUtil::getVersionAsString(mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion()), mCnmt.getAddOnContentMetaExtendedHeader().getRequiredApplicationVersion());
@@ -177,10 +177,10 @@ void nstool::CnmtProcess::displayCnmt()
 			break;
 		case (pie::hac::cnmt::ContentMetaType_Delta):
             if (outputJSON) {
-                output["meta"]["extendedHeader"]["type"] = "delta meta";
-                output["meta"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
-                output["meta"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getDeltaMetaExtendedHeader().getApplicationId();
+                output["archive"]["extendedHeader"]["type"] = "delta meta";
+                output["archive"]["extendedHeader"]["applicationId"]["hex"] = fmt::format("0x{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["string"] = fmt::format("{:016x}", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
+                output["archive"]["extendedHeader"]["applicationId"]["int"] = mCnmt.getDeltaMetaExtendedHeader().getApplicationId();
             } else {
                 fmt::print("  DeltaMetaExtendedHeader:\n");
                 fmt::print("    ApplicationId:         0x{:016x}\n", mCnmt.getDeltaMetaExtendedHeader().getApplicationId());
@@ -197,11 +197,11 @@ void nstool::CnmtProcess::displayCnmt()
 			const pie::hac::ContentInfo& info = mCnmt.getContentInfo()[i];
 
             if (outputJSON) {
-                output["meta"]["contentInfo"][i]["type"]["string"] = pie::hac::ContentMetaUtil::getContentTypeAsString(info.getContentType());
-                output["meta"]["contentInfo"][i]["type"]["int"] = (uint32_t)info.getContentType();
-                output["meta"]["contentInfo"][i]["id"] = tc::cli::FormatUtil::formatBytesAsString(info.getContentId().data(), info.getContentId().size(), false, "");
-                output["meta"]["contentInfo"][i]["size"] = fmt::format("0x{:x}", info.getContentSize());
-                output["meta"]["contentInfo"][i]["hash"] = tc::cli::FormatUtil::formatBytesAsString(info.getContentHash().data(), info.getContentHash().size(), false, "");
+                output["archive"]["contentInfo"][i]["type"]["string"] = pie::hac::ContentMetaUtil::getContentTypeAsString(info.getContentType());
+                output["archive"]["contentInfo"][i]["type"]["int"] = (uint32_t)info.getContentType();
+                output["archive"]["contentInfo"][i]["id"] = tc::cli::FormatUtil::formatBytesAsString(info.getContentId().data(), info.getContentId().size(), false, "");
+                output["archive"]["contentInfo"][i]["size"] = fmt::format("0x{:x}", info.getContentSize());
+                output["archive"]["contentInfo"][i]["hash"] = tc::cli::FormatUtil::formatBytesAsString(info.getContentHash().data(), info.getContentHash().size(), false, "");
             } else {
                 fmt::print("    {:d}\n", i);
                 fmt::print("      Type:         {:s} ({:d})\n", pie::hac::ContentMetaUtil::getContentTypeAsString(info.getContentType()), (uint32_t)info.getContentType());
@@ -221,7 +221,7 @@ void nstool::CnmtProcess::displayCnmt()
 	if (mCnmt.getContentMetaType() == pie::hac::cnmt::ContentMetaType_Patch && mCnmt.getPatchMetaExtendedHeader().getExtendedDataSize() != 0) {
 		// this is stubbed because the raw output is for development purposes
         if (outputJSON) {
-            output["meta"]["extendedData"]["type"] = "patch meta";
+            output["archive"]["extendedData"]["type"] = "patch meta";
         } else {
             //fmt::print("  PatchMetaExtendedData:\n");
 		    //tc::cli::FormatUtil::formatBytesAsHxdHexString(mCnmt.getPatchMetaExtendedData().data(), mCnmt.getPatchMetaExtendedData().size());
@@ -229,15 +229,15 @@ void nstool::CnmtProcess::displayCnmt()
 	} else if (mCnmt.getContentMetaType() == pie::hac::cnmt::ContentMetaType_Delta && mCnmt.getDeltaMetaExtendedHeader().getExtendedDataSize() != 0) {
 		// this is stubbed because the raw output is for development purposes
         if (outputJSON) {
-            output["meta"]["extendedData"]["type"] = "delta meta";
+            output["archive"]["extendedData"]["type"] = "delta meta";
         } else {
             //fmt::print("  DeltaMetaExtendedData:\n");
             //tc::cli::FormatUtil::formatBytesAsHxdHexString(mCnmt.getDeltaMetaExtendedData().data(), mCnmt.getDeltaMetaExtendedData().size());
         }
 	} else if (mCnmt.getContentMetaType() == pie::hac::cnmt::ContentMetaType_SystemUpdate && mCnmt.getSystemUpdateMetaExtendedHeader().getExtendedDataSize() != 0) {
 		if (outputJSON) {
-            output["meta"]["extendedData"]["type"] = "system update meta";
-            output["meta"]["extendedData"]["formatVersion"] = mCnmt.getSystemUpdateMetaExtendedData().getFormatVersion();
+            output["archive"]["extendedData"]["type"] = "system update meta";
+            output["archive"]["extendedData"]["formatVersion"] = mCnmt.getSystemUpdateMetaExtendedData().getFormatVersion();
         } else {
             fmt::print("  SystemUpdateMetaExtendedData:\n");
             fmt::print("    FormatVersion:         {:d}\n", mCnmt.getSystemUpdateMetaExtendedData().getFormatVersion());
@@ -249,8 +249,8 @@ void nstool::CnmtProcess::displayCnmt()
         for (size_t i = 0; i < mCnmt.getSystemUpdateMetaExtendedData().getFirmwareVariationInfo().size(); i++)
 		{
             if (outputJSON) {
-                output["meta"]["firmwareVariation"][i]["index"] = i;
-                output["meta"]["firmwareVariation"][i]["id"] = fmt::format("0x{:x}", variation_info[i].variation_id);
+                output["archive"]["firmwareVariation"][i]["index"] = i;
+                output["archive"]["firmwareVariation"][i]["id"] = fmt::format("0x{:x}", variation_info[i].variation_id);
             } else {
                 fmt::print("      {:d}\n", i);
                 fmt::print("        FirmwareVariationId:  0x{:x}\n", variation_info[i].variation_id);
@@ -258,7 +258,7 @@ void nstool::CnmtProcess::displayCnmt()
 
             if (mCnmt.getSystemUpdateMetaExtendedData().getFormatVersion() == 2) {
                 if (outputJSON) {
-                    output["meta"]["firmwareVariation"][i]["referToBase"] = variation_info[i].meta.empty();
+                    output["archive"]["firmwareVariation"][i]["referToBase"] = variation_info[i].meta.empty();
                 } else {
                     fmt::print("        ReferToBase:          {}\n", variation_info[i].meta.empty());
                 }
@@ -272,7 +272,7 @@ void nstool::CnmtProcess::displayCnmt()
 	}
 
     if (outputJSON) {
-        output["meta"]["digest"] = tc::cli::FormatUtil::formatBytesAsString(mCnmt.getDigest().data(), mCnmt.getDigest().size(), false, "");
+        output["archive"]["digest"] = tc::cli::FormatUtil::formatBytesAsString(mCnmt.getDigest().data(), mCnmt.getDigest().size(), false, "");
     } else {
         fmt::print("  Digest:   {:s}\n", tc::cli::FormatUtil::formatBytesAsString(mCnmt.getDigest().data(), mCnmt.getDigest().size(), false, ""));
     }
