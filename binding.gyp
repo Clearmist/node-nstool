@@ -58,7 +58,8 @@
                     '-arch x86_64',
                     '-arch arm64',
                     '-std=c++17',
-                    '-stdlib=libc++'
+                    '-stdlib=libc++',
+                    '-fexceptions'
                 ],
                 'OTHER_LDFLAGS': [
                     '-arch x86_64',
