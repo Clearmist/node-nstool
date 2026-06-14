@@ -51,7 +51,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-build/
+build
+library
 
 .vs/
 .vscode/
@@ -59,6 +60,8 @@ build/
 node_modules/
 
 # Testing files
+test.nsp
+test.xci
 test.js
 test*.json
 *.lnk

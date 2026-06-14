@@ -1,0 +1,30 @@
+{
+  "name": "node-nstool Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspaces/node-nstool",
+  "postCreateCommand": "git submodule sync --recursive && paths=$(git config --file .gitmodules --get-regexp '^submodule\\..*\\.path$' | awk '{print $2}') && valid='' && for p in $paths; do if git ls-files --stage -- \"$p\" | grep -q '^160000 '; then valid=\"$valid $p\"; fi; done && if [ -n \"$valid\" ]; then git submodule update --init --recursive -- $valid; fi || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // C/C++ Extension. Provides C/C++ language support.
+        "llvm-vs-code-extensions.vscode-clangd",
+        // Editor Config. Helps maintain consistent coding styles.
+        "editorconfig.editorconfig",
+        // Formatter.
+        "xaver.clang-format"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  },
+  "containerEnv": {
+    "ROOT_PROJECT_NAME": "node-nstool",
+    "ROOT_PROJECT_PATH": "/workspaces/node-nstool"
+  },
+  "mounts": [],
+  "forwardPorts": []
+}

@@ -23,9 +23,6 @@
                 '-fno-exceptions',
                 '-std=c++17'
             ],
-            'ldflags' : [
-                '-Wl,-static'
-            ],
             'include_dirs': [
                 "<!(node -p \"require('node-api-headers').include_dir\")",
                 "<!(node -p \"require('node-addon-api').include_dir\")",
@@ -38,18 +35,6 @@
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")",
                 "<!(node -p \"require('node-addon-api').targets\"):node_addon_api",
-            ],
-            'copies': [
-                {
-                    'destination': '<(module_root_dir)/build/Release',
-                    'files': [
-                        '<(module_root_dir)/library/fmt.lib',
-                        '<(module_root_dir)/library/liblz4.lib',
-                        '<(module_root_dir)/library/libmbedtls.lib',
-                        '<(module_root_dir)/library/tc.lib',
-                        '<(module_root_dir)/library/pietendo.lib'
-                    ]
-                }
             ],
             'defines': [
                 'NODE_ADDON_API',
@@ -84,6 +69,18 @@
                 [
                     "OS=='win'",
                     {
+                        'copies': [
+                            {
+                                'destination': '<(module_root_dir)/build/Release',
+                                'files': [
+                                    '<(module_root_dir)/library/fmt.lib',
+                                    '<(module_root_dir)/library/liblz4.lib',
+                                    '<(module_root_dir)/library/libmbedtls.lib',
+                                    '<(module_root_dir)/library/tc.lib',
+                                    '<(module_root_dir)/library/pietendo.lib'
+                                ]
+                            }
+                        ],
                         'defines': [
                             '_HAS_EXCEPTIONS=1',
                             '_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS=1'
@@ -94,6 +91,19 @@
                     "OS=='mac'",
                     {
                         'cflags+': ['-fvisibility=hidden'],
+                    }
+                ],
+                [
+                    "OS=='linux'",
+                    {
+                        'cflags+': [
+                            '-fvisibility=hidden',
+                            '-fPIC',
+                        ],
+                        'cflags_cc+': [
+                            '-fvisibility=hidden',
+                            '-fPIC',
+                        ],
                     }
                 ],
             ],

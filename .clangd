@@ -1,0 +1,13 @@
+CompileFlags:
+  Add:
+    - "-std=c++17"
+    - "-I/workspaces/node-nstool/deps/nstool/src"
+    - "-I/workspaces/node-nstool/src/include"
+    - "-I/workspaces/node-nstool/deps/nstool/deps/libfmt/include"
+    - "-I/workspaces/node-nstool/deps/nstool/deps/liblz4/include"
+    - "-I/workspaces/node-nstool/deps/nstool/deps/libmbedtls/include"
+    - "-I/workspaces/node-nstool/deps/nstool/deps/libpietendo/include"
+    - "-I/workspaces/node-nstool/deps/nstool/deps/libtoolchain/include"
+    - "-I/workspaces/node-nstool/node_modules/node-api-headers/include"
+    - "-I/workspaces/node-nstool/node_modules/node-addon-api"
+    - "-DNODE_ADDON_API"

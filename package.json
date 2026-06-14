@@ -11,15 +11,17 @@
   ],
   "main": "index.js",
   "scripts": {
-    "install": "node-gyp-build",
-    "prebuild": "prebuildify --napi",
-    "build": "node-gyp rebuild",
+    "install": "node-gyp-build || npm run build",
+    "package-prebuild": "prebuildify --napi",
+    "rebuild": "node-gyp rebuild",
+    "test": "node --test",
+    "build": "npm run build-libraries && node-gyp rebuild",
     "build-libraries": "npm-run-all --parallel libfmt liblz4 libmbedtls --serial libtoolchain libpietendo",
-    "libfmt": "cd src/deps/libfmt && cmake-js rebuild",
-    "liblz4": "cd src/deps/liblz4 && cmake-js rebuild",
-    "libmbedtls": "cd src/deps/libmbedtls && cmake-js rebuild",
-    "libtoolchain": "cd src/deps/libtoolchain && cmake-js rebuild",
-    "libpietendo": "cd src/deps/libpietendo && cmake-js rebuild",
+    "libfmt": "cd deps/nstool/deps/libfmt && cmake-js rebuild && node ../../../../scripts/copy-library.js libfmt",
+    "liblz4": "cd deps/nstool/deps/liblz4 && cmake-js rebuild && node ../../../../scripts/copy-library.js liblz4",
+    "libmbedtls": "cd deps/nstool/deps/libmbedtls && cmake-js rebuild && node ../../../../scripts/copy-library.js libmbedtls",
+    "libtoolchain": "cd deps/nstool/deps/libtoolchain && cmake-js rebuild && node ../../../../scripts/copy-library.js libtoolchain",
+    "libpietendo": "cd deps/nstool/deps/libpietendo && cmake-js rebuild && node ../../../../scripts/copy-library.js libpietendo",
     "clean": "node-gyp clean"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",
@@ -33,13 +35,14 @@
   },
   "license": "ISC",
   "dependencies": {
-    "cmake-js": "^7.3.0",
-    "node-addon-api": "^8.3.0",
+    "cmake-js": "^8.0.0",
+    "node-addon-api": "^8.8.0",
     "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
-    "node-gyp": "^11.0.0",
-    "npm-run-all": "^4.1.5"
+    "node-gyp": "^13.0.0",
+    "npm-run-all": "^4.1.5",
+    "prebuildify": "^6.0.1"
   },
   "gypfile": true,
   "binary": {
@@ -50,5 +53,6 @@
   "config": {
     "runtime": "napi",
     "target": 8
-  }
+  },
+  "packageManager": "npm@11.17.0"
 }
