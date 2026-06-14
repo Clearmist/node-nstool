@@ -7,7 +7,7 @@ const path = require('path');
 const libName = process.argv[2];
 
 if (!libName) {
-  console.error('Usage: copy-library.js <library-name>');
+  console.error('Usage: copy-library.cjs <library-name>');
   process.exit(1);
 }
 

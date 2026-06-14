@@ -1,10 +1,12 @@
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const test = require('node:test');
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+import addon from '../index.js';
 
-const addon = require('../index.js');
+const require = createRequire(import.meta.url);
 
 const fixtureNames = ['test.nsp', 'test.xci'];
 const fixturePaths = Object.fromEntries(

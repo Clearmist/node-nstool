@@ -7,7 +7,7 @@
             'target_name': 'node-nstool',
             'sources': [
                 'src/node-nstool.cpp',
-                "<!@(node binding.js sources)"
+                "<!@(node binding.cjs sources)"
             ],
             'cflags': [
                 '-std=c++17',
@@ -27,10 +27,10 @@
                 "<!(node -p \"require('node-api-headers').include_dir\")",
                 "<!(node -p \"require('node-addon-api').include_dir\")",
                 "<!@(node -p \"require('node-addon-api').include\")",
-                "<!@(node binding.js include_dirs)"
+                "<!@(node binding.cjs include_dirs)"
             ],
             'libraries': [
-                '<!@(node binding.js libraries)'
+                '<!@(node binding.cjs libraries)'
             ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")",

@@ -23,22 +23,23 @@ function usePrebuiltLibraries() {
            fs.existsSync(path.join(libDir, 'libmbedtls.lib')) &&
            fs.existsSync(path.join(libDir, 'tc.lib')) &&
            fs.existsSync(path.join(libDir, 'pietendo.lib'));
-  } else {
-    // Check for Unix .a files
-    return fs.existsSync(path.join(libDir, 'libfmt.a')) &&
-           fs.existsSync(path.join(libDir, 'liblz4.a')) &&
-           fs.existsSync(path.join(libDir, 'libmbedtls.a')) &&
-           fs.existsSync(path.join(libDir, 'libtoolchain.a')) &&
-           fs.existsSync(path.join(libDir, 'libpietendo.a'));
   }
+
+  // Check for Unix .a files
+  return fs.existsSync(path.join(libDir, 'libfmt.a')) &&
+         fs.existsSync(path.join(libDir, 'liblz4.a')) &&
+         fs.existsSync(path.join(libDir, 'libmbedtls.a')) &&
+         fs.existsSync(path.join(libDir, 'libtoolchain.a')) &&
+         fs.existsSync(path.join(libDir, 'libpietendo.a'));
 }
 
 switch (arg[0]) {
-  case 'sources':
+  case 'sources': {
     const directory = './deps/nstool/src';
 
     fs.readdirSync(directory).filter((file) => file.endsWith('.c') || file.endsWith('.cpp')).forEach((file) => list.push(`${directory}/${file}`));
     break;
+  }
   case 'include_dirs':
     list = [
       './deps/nstool/src',
@@ -71,25 +72,23 @@ switch (arg[0]) {
           '<(module_root_dir)/library/liblz4.a',
         ];
       }
-    } else {
+    } else if (isWin) {
       // Fall back to built libraries in deps
-      if (isWin) {
-        list = [
-          '<(module_root_dir)/library/fmt.lib',
-          '<(module_root_dir)/library/liblz4.lib',
-          '<(module_root_dir)/library/libmbedtls.lib',
-          '<(module_root_dir)/library/tc.lib',
-          '<(module_root_dir)/library/pietendo.lib',
-        ];
-      } else {
-        list = [
-          `<(module_root_dir)/deps/nstool/deps/libpietendo/bin/${platformDir}/libpietendo.a`,
-          `<(module_root_dir)/deps/nstool/deps/libtoolchain/bin/${platformDir}/libtoolchain.a`,
-          `<(module_root_dir)/deps/nstool/deps/libmbedtls/bin/${platformDir}/libmbedtls.a`,
-          `<(module_root_dir)/deps/nstool/deps/libfmt/bin/${platformDir}/libfmt.a`,
-          `<(module_root_dir)/deps/nstool/deps/liblz4/bin/${platformDir}/liblz4.a`,
-        ];
-      }
+      list = [
+        '<(module_root_dir)/library/fmt.lib',
+        '<(module_root_dir)/library/liblz4.lib',
+        '<(module_root_dir)/library/libmbedtls.lib',
+        '<(module_root_dir)/library/tc.lib',
+        '<(module_root_dir)/library/pietendo.lib',
+      ];
+    } else {
+      list = [
+        `<(module_root_dir)/deps/nstool/deps/libpietendo/bin/${platformDir}/libpietendo.a`,
+        `<(module_root_dir)/deps/nstool/deps/libtoolchain/bin/${platformDir}/libtoolchain.a`,
+        `<(module_root_dir)/deps/nstool/deps/libmbedtls/bin/${platformDir}/libmbedtls.a`,
+        `<(module_root_dir)/deps/nstool/deps/libfmt/bin/${platformDir}/libfmt.a`,
+        `<(module_root_dir)/deps/nstool/deps/liblz4/bin/${platformDir}/liblz4.a`,
+      ];
     }
     break;
   default:

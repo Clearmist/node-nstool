@@ -10,7 +10,12 @@
     "nca",
     "xci"
   ],
-  "main": "index.js",
+  "type": "module",
+  "main": "index.cjs",
+  "exports": {
+    "import": "./index.js",
+    "require": "./index.cjs"
+  },
   "scripts": {
     "install": "node-gyp-build || npm run build",
     "package-prebuild": "prebuildify --napi",
@@ -18,11 +23,11 @@
     "test": "node --test",
     "build": "npm run build-libraries && node-gyp rebuild",
     "build-libraries": "npm-run-all --parallel libfmt liblz4 libmbedtls --serial libtoolchain libpietendo",
-    "libfmt": "cd deps/nstool/deps/libfmt && cmake-js rebuild && node ../../../../scripts/copy-library.js libfmt",
-    "liblz4": "cd deps/nstool/deps/liblz4 && cmake-js rebuild && node ../../../../scripts/copy-library.js liblz4",
-    "libmbedtls": "cd deps/nstool/deps/libmbedtls && cmake-js rebuild && node ../../../../scripts/copy-library.js libmbedtls",
-    "libtoolchain": "cd deps/nstool/deps/libtoolchain && cmake-js rebuild && node ../../../../scripts/copy-library.js libtoolchain",
-    "libpietendo": "cd deps/nstool/deps/libpietendo && cmake-js rebuild && node ../../../../scripts/copy-library.js libpietendo",
+    "libfmt": "cd deps/nstool/deps/libfmt && cmake-js rebuild && node ../../../../scripts/copy-library.cjs libfmt",
+    "liblz4": "cd deps/nstool/deps/liblz4 && cmake-js rebuild && node ../../../../scripts/copy-library.cjs liblz4",
+    "libmbedtls": "cd deps/nstool/deps/libmbedtls && cmake-js rebuild && node ../../../../scripts/copy-library.cjs libmbedtls",
+    "libtoolchain": "cd deps/nstool/deps/libtoolchain && cmake-js rebuild && node ../../../../scripts/copy-library.cjs libtoolchain",
+    "libpietendo": "cd deps/nstool/deps/libpietendo && cmake-js rebuild && node ../../../../scripts/copy-library.cjs libpietendo",
     "clean": "node-gyp clean"
   },
   "homepage": "https://github.com/Clearmist/node-nstool#readme",
