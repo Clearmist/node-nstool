@@ -44,7 +44,8 @@
                     'AdditionalOptions': [
                         '-std:c++20',
                         '-permissive',
-                        '/MD'
+                        '/MD',
+                        '/utf-8'
                     ],
                     'ExceptionHandling': 1,
                     'RuntimeLibrary': 2
