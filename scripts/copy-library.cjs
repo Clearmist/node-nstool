@@ -11,9 +11,10 @@ if (!libName) {
   process.exit(1);
 }
 
-// Determine platform directory
-const isWin = process.platform === 'win32';
-const platformDir = process.platform === 'darwin' ? 'macos' : (isWin ? 'win32' : 'linux');
+// Determine target platform directory.
+const targetPlatform = process.env.NODE_NSTOOL_TARGET_PLATFORM || process.env.npm_config_platform || process.platform;
+const isWin = targetPlatform === 'win32';
+const platformDir = targetPlatform === 'darwin' ? 'macos' : (isWin ? 'win32' : 'linux');
 
 // Resolve source artifact names and destination names per platform.
 const unixArtifacts = {
@@ -25,11 +26,11 @@ const unixArtifacts = {
 };
 
 const winArtifacts = {
-  libfmt: { sources: ['fmt.lib', 'libfmt.lib'], dest: 'fmt.lib' },
-  liblz4: { sources: ['lz4.lib', 'liblz4.lib'], dest: 'liblz4.lib' },
-  libmbedtls: { sources: ['mbedtls.lib', 'libmbedtls.lib'], dest: 'libmbedtls.lib' },
-  libtoolchain: { sources: ['toolchain.lib', 'libtoolchain.lib', 'tc.lib'], dest: 'tc.lib' },
-  libpietendo: { sources: ['pietendo.lib', 'libpietendo.lib'], dest: 'pietendo.lib' },
+  libfmt: { sources: ['fmt.lib', 'libfmt.lib', 'libfmt.a'], dest: 'fmt.lib' },
+  liblz4: { sources: ['lz4.lib', 'liblz4.lib', 'liblz4.a'], dest: 'liblz4.lib' },
+  libmbedtls: { sources: ['mbedtls.lib', 'libmbedtls.lib', 'libmbedtls.a'], dest: 'libmbedtls.lib' },
+  libtoolchain: { sources: ['toolchain.lib', 'libtoolchain.lib', 'tc.lib', 'libtoolchain.a'], dest: 'tc.lib' },
+  libpietendo: { sources: ['pietendo.lib', 'libpietendo.lib', 'libpietendo.a'], dest: 'pietendo.lib' },
 };
 
 const artifact = isWin ? winArtifacts[libName] : unixArtifacts[libName];
