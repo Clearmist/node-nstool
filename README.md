@@ -11,7 +11,7 @@ A Node.js native addon wrapping [nstool](https://github.com/jakcron/nstool) for 
   - `darwin-arm64`
   - `win32-x64`
 
-If no prebuild matches your platform the module will compile from source, which requires a C++17 toolchain and CMake.
+If no prebuild matches your platform the module will compile from source, which requires a C++20 toolchain and CMake.
 
 ## Installation
 

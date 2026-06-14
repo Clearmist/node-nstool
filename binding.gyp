@@ -10,18 +10,18 @@
                 "<!@(node binding.cjs sources)"
             ],
             'cflags': [
-                '-std=c++17',
+                '-std=c++20',
             ],
             'cflags_cc': [
-                '-std=c++17'
+                '-std=c++20'
             ],
             'cflags!': [
                 '-fno-exceptions',
-                '-std=c++17'
+                '-std=c++20'
             ],
             "cflags_cc!": [
                 '-fno-exceptions',
-                '-std=c++17'
+                '-std=c++20'
             ],
             'include_dirs': [
                 "<!(node -p \"require('node-api-headers').include_dir\")",
@@ -42,7 +42,7 @@
             'msvs_settings': {
                 'VCCLCompilerTool': {
                     'AdditionalOptions': [
-                        '-std:c++17',
+                        '-std:c++20',
                         '-permissive',
                         '/MD'
                     ],
@@ -54,12 +54,12 @@
                 'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
                 'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
                 'CLANG_CXX_LIBRARY': 'libc++',
-                'CLANG_CXX_LANGUAGE_STANDARD': 'c++17',
+                'CLANG_CXX_LANGUAGE_STANDARD': 'c++20',
                 'MACOSX_DEPLOYMENT_TARGET': '10.9',
                 'OTHER_CFLAGS': [
                     '-arch x86_64',
                     '-arch arm64',
-                    '-std=c++17',
+                    '-std=c++20',
                     '-stdlib=libc++',
                     '-fexceptions'
                 ],
