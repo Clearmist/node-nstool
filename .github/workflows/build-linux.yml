@@ -17,10 +17,8 @@ jobs:
         include:
           - os: ubuntu-latest
             arch: x64
-            node_arch: x64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             arch: arm64
-            node_arch: arm64
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,8 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build libraries (x64 only)
-        if: matrix.arch == 'x64'
+      - name: Build libraries
         run: npm run build-libraries
 
       - name: Build for ${{ matrix.arch }}

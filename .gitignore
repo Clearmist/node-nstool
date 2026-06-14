@@ -55,7 +55,6 @@ build
 library
 
 .vs/
-.vscode/
 
 node_modules/
 
