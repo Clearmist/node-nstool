@@ -47,7 +47,7 @@
                         '/MD'
                     ],
                     'ExceptionHandling': 1,
-                    'RuntimeLibrary': '2'
+                    'RuntimeLibrary': 2
                 },
             },
             'xcode_settings': {
