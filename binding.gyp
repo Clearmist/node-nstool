@@ -43,10 +43,11 @@
                 'VCCLCompilerTool': {
                     'AdditionalOptions': [
                         '-std:c++17',
-                        '-permissive'
+                        '-permissive',
+                        '/MD'
                     ],
                     'ExceptionHandling': 1,
-                    'RuntimeLibrary': 2
+                    'RuntimeLibrary': '2'
                 },
             },
             'xcode_settings': {
