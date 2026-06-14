@@ -16,7 +16,7 @@ const repoRoot = path.join(__dirname, '..');
 const libPath = path.join(repoRoot, libDir);
 
 // libfmt requires MSVC to be invoked with /utf-8 (defines __STDC_ISO_10646__).
-// This is passed as an extra cmake arg (after --) so it appended last in the
+// This is passed as an extra cmake arg (after --) so it is appended last in the
 // cmake configure command, ensuring it is not overridden by cmake-js defaults.
 const cmakeFlags = process.platform === 'win32' ? ' -- -DCMAKE_CXX_FLAGS=/utf-8' : '';
 const cmakeBuildCmd = `cmake-js rebuild${cmakeFlags}`;
