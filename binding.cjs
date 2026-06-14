@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetPlatform = process.env.NODE_NSTOOL_TARGET_PLATFORM || process.env.npm_config_platform || process.platform;
-const isWin = targetPlatform === 'win32';
-const platformDir = targetPlatform === 'darwin' ? 'macos' : (isWin ? 'win32' : 'linux');
+const isWin = process.platform === 'win32';
+const platformDir = process.platform === 'darwin' ? 'macos' : (isWin ? 'win32' : 'linux');
 
 const arg = process.argv.slice(2);
 

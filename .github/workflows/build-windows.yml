@@ -11,21 +11,13 @@ on:
 jobs:
   build-windows:
     name: Build node-nstool for Windows ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - arch: x64
+          - os: windows-latest
+            arch: x64
             node_arch: x64
-    env:
-      NODE_NSTOOL_TARGET_PLATFORM: win32
-      npm_config_platform: win32
-      npm_config_arch: x64
-      CC: x86_64-w64-mingw32-gcc
-      CXX: x86_64-w64-mingw32-g++
-      AR: x86_64-w64-mingw32-ar
-      RANLIB: x86_64-w64-mingw32-ranlib
-      GYP_DEFINES: OS=win
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,35 +29,18 @@ jobs:
           node-version: '22'
           architecture: ${{ matrix.node_arch }}
 
-      - name: Install MinGW cross-compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mingw-w64
-
       - name: Install dependencies
         run: npm install
 
-      - name: Build Windows static libraries (cross-compile)
-        run: |
-          set -euxo pipefail
-          for lib in libfmt liblz4 libmbedtls libtoolchain libpietendo; do
-            pushd "deps/nstool/deps/${lib}"
-            npx cmake-js rebuild \
-              --prefer-make \
-              --cc "$CC" \
-              --cxx "$CXX" \
-              --CDCMAKE_SYSTEM_NAME=Windows \
-              --CDPLATFORM_NAME=win32
-            popd
-            node scripts/copy-library.cjs "$lib"
-          done
+      - name: Build libraries
+        run: npm run build-libraries
 
       - name: Build for ${{ matrix.arch }}
-        run: npm run rebuild -- --arch=${{ matrix.arch }}
+        run: npm run rebuild
 
       - name: Create prebuilds
         if: github.event_name == 'release'
-        run: npm run package-prebuild -- --platform win32 --arch ${{ matrix.arch }}
+        run: npm run package-prebuild
 
       - name: Upload prebuilds
         if: github.event_name == 'release'
