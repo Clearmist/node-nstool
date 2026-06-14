@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build libraries
+        run: npm run build-libraries
+
       - name: Build for ${{ matrix.arch }}
         run: npm run rebuild
 
