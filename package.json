@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Node native module to access nstool.",
   "keywords": [
+    "node",
     "nstool",
     "switch",
     "nintendo",
@@ -45,14 +46,17 @@
     "prebuildify": "^6.0.1"
   },
   "gypfile": true,
+  "engines": {
+    "node": ">=22"
+  },
   "binary": {
     "napi_versions": [
-      8
+      10
     ]
   },
   "config": {
     "runtime": "napi",
-    "target": 8
+    "target": 10
   },
   "packageManager": "npm@11.17.0"
 }
