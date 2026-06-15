@@ -22,8 +22,6 @@ const configureFlags = process.platform === 'win32' ? ' -- -DCMAKE_CXX_FLAGS=/ut
 const copyCmd = `node "${path.join(__dirname, 'copy-library.cjs')}" ${libName}`;
 
 execSync('cmake-js clean', { cwd: libPath, stdio: 'inherit' });
-if (process.platform === 'win32') {
-  execSync(`cmake-js configure${configureFlags}`, { cwd: libPath, stdio: 'inherit' });
-}
+execSync(`cmake-js configure${configureFlags}`, { cwd: libPath, stdio: 'inherit' });
 execSync('cmake-js build', { cwd: libPath, stdio: 'inherit' });
 execSync(copyCmd, { cwd: libPath, stdio: 'inherit' });
