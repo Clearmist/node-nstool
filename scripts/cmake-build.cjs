@@ -16,12 +16,12 @@ const repoRoot = path.join(__dirname, '..');
 const libPath = path.join(repoRoot, libDir);
 
 // libfmt requires MSVC to be invoked with /utf-8 (defines __STDC_ISO_10646__).
-// cmake-js v8 rebuild() clears extraCMakeArgs before building, so the flag
-// must be passed via cmake-js build (which preserves extraCMakeArgs through
-// the configure step) rather than rebuild.
-const cmakeFlags = process.platform === 'win32' ? ' -- -DCMAKE_CXX_FLAGS=/utf-8' : '';
+// Pass the flag during configure only; forwarding it to cmake --build causes
+// "Unknown argument -DCMAKE_CXX_FLAGS=/utf-8" on Windows.
+const configureFlags = process.platform === 'win32' ? ' -- -DCMAKE_CXX_FLAGS=/utf-8' : '';
 const copyCmd = `node "${path.join(__dirname, 'copy-library.cjs')}" ${libName}`;
 
 execSync('cmake-js clean', { cwd: libPath, stdio: 'inherit' });
-execSync(`cmake-js build${cmakeFlags}`, { cwd: libPath, stdio: 'inherit' });
+execSync(`cmake-js configure${configureFlags}`, { cwd: libPath, stdio: 'inherit' });
+execSync('cmake-js build', { cwd: libPath, stdio: 'inherit' });
 execSync(copyCmd, { cwd: libPath, stdio: 'inherit' });
