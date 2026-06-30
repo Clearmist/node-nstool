@@ -47,12 +47,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prebuilds-linux-${{ matrix.arch }}
-          path: prebuilds/*.tar.gz
+          path: prebuilds/
 
       - name: Upload to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: prebuilds/*.tar.gz
+          files: prebuilds/**/*.node
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
