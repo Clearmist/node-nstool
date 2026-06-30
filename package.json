@@ -1,6 +1,6 @@
 {
-  "name": "node-nstool",
-  "version": "0.1.0",
+  "name": "@clearmist-labs/node-nstool",
+  "version": "1.0.0",
   "description": "Node native module to access nstool.",
   "keywords": [
     "node",
@@ -17,8 +17,8 @@
     "require": "./index.cjs"
   },
   "scripts": {
-    "install": "node-gyp-build || npm run build",
-    "package-prebuild": "prebuildify --napi",
+    "install": "prebuild-install || npm run build",
+    "package-prebuild": "prebuild --runtime napi --all",
     "rebuild": "node-gyp rebuild",
     "test": "node --test",
     "build": "npm run build-libraries && node-gyp rebuild",
@@ -43,12 +43,13 @@
   "dependencies": {
     "cmake-js": "^8.0.0",
     "node-addon-api": "^8.8.0",
-    "node-gyp-build": "^4.8.4"
+    "node-gyp-build": "^4.8.4",
+    "prebuild-install": "^7.1.3"
   },
   "devDependencies": {
     "node-gyp": "^13.0.0",
     "npm-run-all": "^4.1.5",
-    "prebuildify": "^6.0.1"
+    "prebuild": "^13.0.1"
   },
   "gypfile": true,
   "engines": {
